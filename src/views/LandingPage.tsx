@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 
 export const LandingPage: React.FC = () => {
-  const { navigateTo, setVideoDemoModalOpen, setPricingModalOpen } = useApp();
+  const { navigateTo, setVideoDemoModalOpen, setPricingModalOpen, themeConfig } = useApp();
 
   // Interactive Live Exam Preview Card State
   const [selectedOption, setSelectedOption] = useState<number | null>(0); // Default A selected
@@ -141,20 +141,20 @@ export const LandingPage: React.FC = () => {
               {/* Top Pill Badge */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200/80 shadow-2xs">
                 <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping"></span>
-                <span>#1 JFT Basic & SSW Mock Test Platform • 30,000+ Students Trusted</span>
+                <span>{themeConfig.instituteTitle} • {themeConfig.instituteSlogan}</span>
               </div>
 
               {/* Headline */}
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.15]">
-                Free JFT Basic Mock Test — <br className="hidden sm:inline" />
+                {themeConfig.instituteName} — <br className="hidden sm:inline" />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 via-red-600 to-amber-600">
-                  Practice Real JFT Exam Online
+                  {themeConfig.instituteTitle}
                 </span>
               </h1>
 
               {/* Subheadline */}
               <p className="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
-                Experience the real Prometric CBT exam environment before your big test day. AI-powered practice for <strong>Script & Vocabulary</strong>, <strong>Workplace Conversation</strong>, <strong>2-Play Listening</strong>, and <strong>Workplace Reading</strong>.
+                <strong>{themeConfig.instituteSlogan}</strong>. Experience the real Prometric CBT exam environment before your big test day in Khulna. Comprehensive preparation for <strong>JFT-Basic</strong>, <strong>Specified Skilled Worker (SSW Tokutei技能 1号)</strong>, and <strong>JLPT N5–N1</strong>.
               </p>
 
               {/* CTA Buttons */}

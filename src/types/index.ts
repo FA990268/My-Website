@@ -20,6 +20,19 @@ export type StorageBucket =
   | 'documents'
   | 'user-avatars';
 
+export interface ThemeConfig {
+  customLogoUrl: string;
+  backgroundImageUrl: string;
+  instituteName: string; // 'DAI ICHI ACADEMY CBT'
+  instituteTitle: string; // 'Dai Ichi Academy Khulna'
+  instituteSlogan: string; // 'Japanese Language and Visa Consultancy'
+  isGlassEnabled: boolean;
+  glassOpacity: number; // 20 to 100 (%)
+  glassBlur: number; // 0 to 30 (px)
+  glassBorder: boolean;
+  fullTransparency: boolean;
+}
+
 export interface CloudFileItem {
   id: string;
   bucket: StorageBucket;

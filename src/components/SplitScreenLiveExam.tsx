@@ -35,11 +35,12 @@ export const SplitScreenLiveExam: React.FC<SplitScreenLiveExamProps> = ({ onTogg
     selectAnswer,
     updateTimeRemaining,
     submitExam,
-    navigateTo
+    navigateTo,
+    themeConfig
   } = useApp();
 
   // Glass opacity slider state (0 to 100)
-  const [glassOpacity, setGlassOpacity] = useState<number>(75);
+  const [glassOpacity, setGlassOpacity] = useState<number>(themeConfig.glassOpacity || 75);
 
   // Mobile view tab toggle: 'paper' (PDF Stimulus) vs 'omr' (Answer Sheet)
   const [mobileTab, setMobileTab] = useState<'paper' | 'omr'>('paper');
@@ -266,10 +267,21 @@ export const SplitScreenLiveExam: React.FC<SplitScreenLiveExamProps> = ({ onTogg
           </span>
         </div>
 
-        {/* Center-Right: CANDIDATE: [Name] in Cyan Text */}
-        <div className="hidden md:flex items-center gap-2">
+        {/* Center-Right: CANDIDATE: [Name] in Cyan Text + Institute Name */}
+        <div className="hidden md:flex items-center gap-2.5">
+          {themeConfig.customLogoUrl && (
+            <img
+              src={themeConfig.customLogoUrl}
+              alt="Logo"
+              className="w-6 h-6 object-contain rounded p-0.5 bg-white/10 border border-white/20"
+            />
+          )}
           <span className="text-[#38bdf8] font-bold text-xs sm:text-sm uppercase tracking-widest drop-shadow-[0_0_6px_rgba(56,189,248,0.4)]">
             CANDIDATE: {candidateName}
+          </span>
+          <span className="text-slate-600 text-xs">|</span>
+          <span className="text-slate-300 font-extrabold text-[11px] uppercase tracking-wider hidden lg:inline">
+            {themeConfig.instituteName}
           </span>
         </div>
 

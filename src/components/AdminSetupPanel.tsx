@@ -53,7 +53,8 @@ export const AdminSetupPanel: React.FC<AdminSetupPanelProps> = ({
     updateMockTest,
     importQuestionsBatch,
     startExam,
-    navigateTo
+    navigateTo,
+    themeConfig
   } = useApp();
 
   // 1. Categories / Groups State
@@ -550,10 +551,22 @@ export const AdminSetupPanel: React.FC<AdminSetupPanelProps> = ({
           ========================================================================= */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-[#1c2336] w-full">
         <div className="space-y-1">
-          <h1 className="text-xl sm:text-2xl font-black text-[#50a2ff] tracking-wider uppercase">
-            ADMIN SETUP
-          </h1>
-          <div className="inline-flex items-center gap-1.5 bg-[#141c2e] text-[#60a5fa] border border-[#2563eb]/40 text-xs font-mono font-bold px-3 py-0.5 rounded-md">
+          <div className="flex items-center gap-2">
+            {themeConfig.customLogoUrl && (
+              <img
+                src={themeConfig.customLogoUrl}
+                alt="Logo"
+                className="w-7 h-7 object-contain rounded p-0.5 bg-white/10 border border-white/20"
+              />
+            )}
+            <h1 className="text-xl sm:text-2xl font-black text-[#50a2ff] tracking-wider uppercase">
+              ADMIN SETUP • {themeConfig.instituteName}
+            </h1>
+          </div>
+          <p className="text-[11px] text-slate-400 font-medium">
+            {themeConfig.instituteTitle} — <span className="italic text-slate-500">{themeConfig.instituteSlogan}</span>
+          </p>
+          <div className="inline-flex items-center gap-1.5 bg-[#141c2e] text-[#60a5fa] border border-[#2563eb]/40 text-xs font-mono font-bold px-3 py-0.5 rounded-md mt-1">
             <span>Q-Count: {totalQuestionCount}</span>
           </div>
         </div>

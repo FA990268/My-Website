@@ -24,12 +24,32 @@ import { AdminPanel } from './views/AdminPanel';
 import { StudentDashboard } from './views/StudentDashboard';
 
 export function App() {
-  const { currentView } = useApp();
+  const { currentView, themeConfig } = useApp();
 
   const isExamLive = currentView === 'exam';
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 font-sans text-slate-900 selection:bg-rose-500 selection:text-white">
+    <div
+      className="min-h-screen flex flex-col font-sans text-slate-900 selection:bg-rose-500 selection:text-white relative"
+      style={{
+        backgroundImage: themeConfig.backgroundImageUrl ? `url(${themeConfig.backgroundImageUrl})` : undefined,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+        backgroundColor: '#090c15'
+      }}
+    >
+      {/* Dynamic Background Glassy Overlay */}
+      {themeConfig.backgroundImageUrl && (
+        <div
+          className="fixed inset-0 pointer-events-none transition-all duration-300 z-0"
+          style={{
+            backgroundColor: themeConfig.fullTransparency ? 'rgba(15, 23, 42, 0.45)' : 'rgba(248, 250, 252, 0.82)',
+            backdropFilter: themeConfig.isGlassEnabled ? `blur(${themeConfig.glassBlur}px)` : undefined
+          }}
+        />
+      )}
+
       {/* 1-Click Role Switcher Demo Control Bar */}
       <DemoToolbar />
 
@@ -37,7 +57,7 @@ export function App() {
       {!isExamLive && <Navbar />}
 
       {/* Primary Page Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col relative z-10">
         {currentView === 'landing' && <LandingPage />}
         {currentView === 'mock-tests' && <MockTestsCatalog />}
         {currentView === 'preview' && <ExamPreview />}

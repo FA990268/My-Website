@@ -27,7 +27,8 @@ export const Navbar: React.FC = () => {
     currentView,
     setAuthModalOpen,
     setPricingModalOpen,
-    switchRole
+    switchRole,
+    themeConfig
   } = useApp();
 
   const [mockTestsDropdownOpen, setMockTestsDropdownOpen] = useState(false);
@@ -44,31 +45,39 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200/80 shadow-xs font-sans transition-all">
+    <header className="sticky top-0 z-40 bg-white/85 backdrop-blur-xl border-b border-slate-200/80 shadow-xs font-sans transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Brand Logo with Torii Emblem */}
+          {/* Brand Logo with Custom Logo or Torii Emblem */}
           <div
             onClick={() => handleNav('landing')}
             className="flex items-center gap-2.5 cursor-pointer select-none group"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 via-red-600 to-amber-500 flex items-center justify-center shadow-md shadow-rose-500/20 text-white font-black text-xl transition-transform group-hover:scale-105">
-              {/* Torii Gate SVG Icon */}
-              <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                <path d="M2 5h20v2h-2v13h-2V7H6v13H4V7H2V5zm3-3h14v2H5V2zm1 7h12v2H6V9z" />
-              </svg>
-            </div>
+            {themeConfig.customLogoUrl ? (
+              <img
+                src={themeConfig.customLogoUrl}
+                alt={themeConfig.instituteTitle}
+                className="w-10 h-10 object-contain rounded-xl border border-slate-200/80 p-0.5 bg-white shadow-xs group-hover:scale-105 transition-transform"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 via-red-600 to-amber-500 flex items-center justify-center shadow-md shadow-rose-500/20 text-white font-black text-xl transition-transform group-hover:scale-105">
+                {/* Torii Gate SVG Icon */}
+                <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                  <path d="M2 5h20v2h-2v13h-2V7H6v13H4V7H2V5zm3-3h14v2H5V2zm1 7h12v2H6V9z" />
+                </svg>
+              </div>
+            )}
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-lg text-slate-900 tracking-tight">
-                  JFT <span className="text-rose-600">GURU</span>
+                <span className="font-extrabold text-base sm:text-lg text-slate-900 tracking-tight">
+                  DAI ICHI <span className="text-rose-600">ACADEMY</span>
                 </span>
                 <span className="text-[10px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200/60">
                   CBT
                 </span>
               </div>
-              <p className="text-[10px] text-slate-500 font-medium hidden sm:block">
-                JFT-Basic & SSW Prometric Official Simulator
+              <p className="text-[10px] text-slate-600 font-medium hidden sm:block truncate max-w-xs md:max-w-sm">
+                <strong className="text-slate-800">Dai Ichi Academy Khulna</strong> • Japanese Language and Visa Consultancy
               </p>
             </div>
           </div>

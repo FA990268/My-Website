@@ -37,7 +37,11 @@ import {
   HardDrive,
   Server,
   ShieldAlert,
-  GraduationCap
+  GraduationCap,
+  Palette,
+  Sliders,
+  RefreshCw,
+  LogOut
 } from 'lucide-react';
 import { AdminSplitScreenEditor } from '../components/AdminSplitScreenEditor';
 import { AdminSetupPanel } from '../components/AdminSetupPanel';
@@ -64,13 +68,20 @@ export const AdminPanel: React.FC = () => {
     importQuestionsBatch,
     toggleUserTier,
     navigateTo,
-    startExam
+    startExam,
+    themeConfig,
+    updateThemeConfig,
+    resetThemeConfig,
+    adminLogout
   } = useApp();
 
-  const [activeAdminTab, setActiveAdminTab] = useState<'setup' | 'overview' | 'split-screen' | 'tests' | 'questions' | 'users' | 'import' | 'storage'>('setup');
+  const [activeAdminTab, setActiveAdminTab] = useState<'setup' | 'overview' | 'split-screen' | 'tests' | 'questions' | 'users' | 'storage' | 'theme' | 'import'>('setup');
   const [selectedTestId, setSelectedTestId] = useState<string>(mockTests[0]?.id || 'test_jft_01');
   const [selectedSectionNumber, setSelectedSectionNumber] = useState<1 | 2 | 3 | 4>(1);
   const [userSearchTerm, setUserSearchTerm] = useState<string>('');
+
+  // Logo & Theme Upload Status
+  const [themeToast, setThemeToast] = useState<string | null>(null);
 
   // Cloud Storage & Database State
   const [storageBucketSelect, setStorageBucketSelect] = useState<StorageBucket>('exam-pdfs');
@@ -189,107 +200,143 @@ export const AdminPanel: React.FC = () => {
 
   return (
     <div className="w-full min-h-screen space-y-5 font-sans p-2 sm:p-4 md:p-6">
-      {/* Admin Panel Header */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl">
+      {/* Admin Panel Header with Institute Branding & Glass Styling */}
+      <div className="bg-gradient-to-r from-slate-900/90 via-indigo-950/90 to-slate-900/90 backdrop-blur-2xl border border-white/20 rounded-3xl p-6 sm:p-8 text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-2xl">
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>Master Administration & Question Management Portal</span>
+              <span>Password-Protected Control Center</span>
             </div>
 
             {currentUser.role === 'admin' ? (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-600/30 text-indigo-200 border border-indigo-500/40">
                 <ShieldAlert className="w-3.5 h-3.5 text-indigo-400" />
-                <span>Super Admin • Full Master Access</span>
+                <span>Super Admin: Master Privileges</span>
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
                 <GraduationCap className="w-3.5 h-3.5 text-amber-400" />
-                <span>Teacher: {currentUser.full_name} • Curriculum Author</span>
+                <span>Teacher: {currentUser.full_name}</span>
               </span>
             )}
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight">Admin & Teacher Control Center</h1>
-          <p className="text-xs sm:text-sm text-slate-300">
-            Configure CBT mock sets, author questions with audio/passages, manage student subscriptions, and monitor cloud storage.
-          </p>
+          <div className="flex items-center gap-3">
+            {themeConfig.customLogoUrl && (
+              <img
+                src={themeConfig.customLogoUrl}
+                alt="Logo"
+                className="w-10 h-10 object-contain rounded-xl p-0.5 bg-white/10 border border-white/20 backdrop-blur"
+              />
+            )}
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight flex items-center gap-2">
+                <span>{themeConfig.instituteName}</span>
+              </h1>
+              <p className="text-xs sm:text-sm font-semibold text-rose-400">
+                {themeConfig.instituteTitle} — <span className="text-slate-300 font-normal italic">{themeConfig.instituteSlogan}</span>
+              </p>
+            </div>
+          </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex items-center gap-1.5 bg-slate-800/90 p-1.5 rounded-2xl border border-slate-700/80 overflow-x-auto">
+        {/* Lock Admin Session Button */}
+        <div className="flex items-center gap-2 self-start md:self-auto">
           <button
-            onClick={() => setActiveAdminTab('setup')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 ${
-              activeAdminTab === 'setup'
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
-                : 'text-blue-300 hover:text-white bg-blue-950/60 border border-blue-500/30'
-            }`}
+            onClick={adminLogout}
+            className="px-3.5 py-2 bg-red-950/70 hover:bg-red-900 border border-red-700/60 text-red-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-red-950/50"
+            title="Lock Admin Session and Require Re-Authentication"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>ADMIN SETUP (Model)</span>
-            <span className="bg-amber-400 text-slate-900 text-[9px] font-black px-1.5 py-0.2 rounded-full uppercase">NEW</span>
-          </button>
-          <button
-            onClick={() => setActiveAdminTab('split-screen')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-              activeAdminTab === 'split-screen' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            <Columns className="w-3.5 h-3.5" />
-            <span>Split-Screen Editor</span>
-          </button>
-          <button
-            onClick={() => setActiveAdminTab('overview')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-              activeAdminTab === 'overview' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            Overview
-          </button>
-          <button
-            onClick={() => setActiveAdminTab('tests')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-              activeAdminTab === 'tests' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            Mock Tests
-          </button>
-          <button
-            onClick={() => setActiveAdminTab('questions')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-              activeAdminTab === 'questions' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            Questions
-          </button>
-          <button
-            onClick={() => setActiveAdminTab('users')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-              activeAdminTab === 'users' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            Students
-          </button>
-          <button
-            onClick={() => setActiveAdminTab('storage')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-              activeAdminTab === 'storage' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            <Database className="w-3.5 h-3.5" />
-            <span>Storage & DB</span>
-          </button>
-          <button
-            onClick={() => setActiveAdminTab('import')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-              activeAdminTab === 'import' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
-            }`}
-          >
-            Import JSON/Excel
+            <Lock className="w-3.5 h-3.5 text-red-400" />
+            <span>Lock & Exit Session</span>
           </button>
         </div>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="flex items-center gap-1.5 bg-slate-900/80 backdrop-blur-xl p-1.5 rounded-2xl border border-white/10 overflow-x-auto">
+        <button
+          onClick={() => setActiveAdminTab('setup')}
+          className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 ${
+            activeAdminTab === 'setup'
+              ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
+              : 'text-blue-300 hover:text-white bg-blue-950/60 border border-blue-500/30'
+          }`}
+        >
+          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <span>ADMIN SETUP (Model)</span>
+          <span className="bg-amber-400 text-slate-900 text-[9px] font-black px-1.5 py-0.2 rounded-full uppercase">NEW</span>
+        </button>
+        <button
+          onClick={() => setActiveAdminTab('split-screen')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+            activeAdminTab === 'split-screen' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
+          }`}
+        >
+          <Columns className="w-3.5 h-3.5" />
+          <span>Split-Screen Editor</span>
+        </button>
+        <button
+          onClick={() => setActiveAdminTab('theme')}
+          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+            activeAdminTab === 'theme' ? 'bg-amber-600 text-white shadow-xs' : 'text-amber-300 hover:text-white bg-amber-950/40 border border-amber-500/30'
+          }`}
+        >
+          <Palette className="w-3.5 h-3.5 text-amber-400" />
+          <span>Theme & Glass Control</span>
+          <span className="bg-amber-400 text-slate-900 text-[9px] font-black px-1.5 py-0.2 rounded-full uppercase">NEW</span>
+        </button>
+        <button
+          onClick={() => setActiveAdminTab('overview')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+            activeAdminTab === 'overview' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
+          }`}
+        >
+          Overview
+        </button>
+        <button
+          onClick={() => setActiveAdminTab('tests')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+            activeAdminTab === 'tests' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
+          }`}
+        >
+          Mock Tests
+        </button>
+        <button
+          onClick={() => setActiveAdminTab('questions')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+            activeAdminTab === 'questions' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
+          }`}
+        >
+          Questions
+        </button>
+        <button
+          onClick={() => setActiveAdminTab('users')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+            activeAdminTab === 'users' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
+          }`}
+        >
+          <Users className="w-3.5 h-3.5" />
+          <span>Student Administration</span>
+        </button>
+        <button
+          onClick={() => setActiveAdminTab('storage')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+            activeAdminTab === 'storage' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
+          }`}
+        >
+          <Database className="w-3.5 h-3.5" />
+          <span>Storage & DB</span>
+        </button>
+        <button
+          onClick={() => setActiveAdminTab('import')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+            activeAdminTab === 'import' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
+          }`}
+        >
+          Import JSON/Excel
+        </button>
       </div>
 
       {/* =========================================================================
@@ -708,6 +755,55 @@ export const AdminPanel: React.FC = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Candidate Exam Attempts & Score History in Admin Panel */}
+          <div className="pt-4 border-t border-slate-100 space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-500">
+                Candidate CBT Exam Attempt Logs & Scaled Scores
+              </h4>
+              <span className="text-[11px] text-slate-400 font-mono">
+                {attempts.length} attempts recorded
+              </span>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold border-y border-slate-200">
+                  <tr>
+                    <th className="py-2.5 px-3">Candidate</th>
+                    <th className="py-2.5 px-3">Exam Paper</th>
+                    <th className="py-2.5 px-3">Total Score</th>
+                    <th className="py-2.5 px-3">Evaluation</th>
+                    <th className="py-2.5 px-3 text-right">Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                  {attempts.map(att => (
+                    <tr key={att.id} className="hover:bg-slate-50 transition">
+                      <td className="py-2.5 px-3 font-bold text-slate-900">
+                        {allUsers.find(u => u.id === att.user_id)?.full_name || 'Tanaka Kenji'}
+                      </td>
+                      <td className="py-2.5 px-3 text-slate-600 truncate max-w-xs">
+                        {att.mock_test_title || 'JFT-Basic Official CBT Mock'}
+                      </td>
+                      <td className="py-2.5 px-3 font-mono font-bold text-slate-800">
+                        {att.total_score} / 250
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${att.passed ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}`}>
+                          {att.passed ? 'PASSED (200+)' : 'FAILED (<200)'}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-3 text-slate-400 text-[11px] text-right">
+                        {new Date(att.started_at).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
@@ -1202,6 +1298,411 @@ export const AdminPanel: React.FC = () => {
           </div>
         );
       })()}
+
+      {/* =========================================================================
+          TAB 7: THEME & GLASS CONTROL PANEL (Branding, Logo, Background, Transparency)
+          ========================================================================= */}
+      {activeAdminTab === 'theme' && (
+        <div className="space-y-6">
+          {/* Theme Banner */}
+          <div className="bg-gradient-to-r from-amber-950/80 via-slate-900/90 to-rose-950/80 backdrop-blur-2xl border border-white/20 rounded-3xl p-6 sm:p-8 text-white shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                <Palette className="w-3.5 h-3.5 text-amber-400" />
+                <span>Custom Brand & Glassmorphic UI Customizer</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
+                Theme & Glass Control Panel
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
+                Configure complete glassy transparent styling, upload institute logos, set custom background wallpapers, and control transparency across all pop-ups, modals, and buttons.
+              </p>
+            </div>
+
+            <button
+              onClick={() => {
+                resetThemeConfig();
+                setThemeToast('✓ Theme reset to factory default glass settings!');
+                setTimeout(() => setThemeToast(null), 3000);
+              }}
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-xs font-bold text-slate-200 transition flex items-center gap-2 self-start md:self-auto backdrop-blur"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Reset to Defaults</span>
+            </button>
+          </div>
+
+          {themeToast && (
+            <div className="p-3.5 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 text-xs font-bold flex items-center gap-2 animate-in fade-in">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>{themeToast}</span>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* 1. Custom Logo & Institute Identity */}
+            <div className="bg-slate-900/80 backdrop-blur-2xl border border-white/20 rounded-3xl p-6 text-white space-y-5 shadow-xl">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-sm text-white">Custom Logo & Institute Identity</h3>
+                    <p className="text-[11px] text-slate-400">Upload institution logo and configure titles</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Current Logo Preview */}
+              <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10">
+                <div className="w-20 h-20 rounded-2xl bg-slate-950/80 border border-white/20 flex items-center justify-center p-2 relative overflow-hidden shrink-0">
+                  {themeConfig.customLogoUrl ? (
+                    <img
+                      src={themeConfig.customLogoUrl}
+                      alt="Custom Logo"
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-rose-600 to-amber-500 flex items-center justify-center text-white font-black text-xl shadow-md">
+                      <svg className="w-7 h-7 fill-current" viewBox="0 0 24 24">
+                        <path d="M2 5h20v2h-2v13h-2V7H6v13H4V7H2V5zm3-3h14v2H5V2zm1 7h12v2H6V9z" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-1 text-xs">
+                  <div className="font-bold text-white">
+                    {themeConfig.customLogoUrl ? 'Active Custom Logo' : 'Default Torii Japanese Emblem'}
+                  </div>
+                  <p className="text-[11px] text-slate-400">
+                    Displayed in Navbar, Live Exam, Header, Footer, and Auth screens.
+                  </p>
+                  {themeConfig.customLogoUrl && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        updateThemeConfig({ customLogoUrl: '' });
+                        setThemeToast('✓ Custom logo removed. Restored default Torii emblem.');
+                        setTimeout(() => setThemeToast(null), 3000);
+                      }}
+                      className="text-[11px] font-bold text-red-400 hover:text-red-300 underline"
+                    >
+                      Remove Custom Logo
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Logo File Upload Input */}
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                  Upload New Institute Logo (PNG, SVG, or JPEG)
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={e => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = ev => {
+                        const dataUrl = ev.target?.result as string;
+                        if (dataUrl) {
+                          updateThemeConfig({ customLogoUrl: dataUrl });
+                          setThemeToast(`✓ Custom logo "${file.name}" uploaded and applied!`);
+                          setTimeout(() => setThemeToast(null), 3000);
+                        }
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  className="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-rose-600 file:text-white hover:file:bg-rose-500 cursor-pointer p-1 rounded-xl bg-slate-950/70 border border-white/10"
+                />
+              </div>
+
+              {/* Institute Name & Slogan Fields */}
+              <div className="space-y-3 pt-2 border-t border-white/10">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-300 mb-1">
+                    System / Brand Name
+                  </label>
+                  <input
+                    type="text"
+                    value={themeConfig.instituteName}
+                    onChange={e => updateThemeConfig({ instituteName: e.target.value })}
+                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-950/70 border border-white/20 text-white focus:outline-rose-500 font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-300 mb-1">
+                    Institute Title
+                  </label>
+                  <input
+                    type="text"
+                    value={themeConfig.instituteTitle}
+                    onChange={e => updateThemeConfig({ instituteTitle: e.target.value })}
+                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-950/70 border border-white/20 text-white focus:outline-rose-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-300 mb-1">
+                    Slogan / Subtitle
+                  </label>
+                  <input
+                    type="text"
+                    value={themeConfig.instituteSlogan}
+                    onChange={e => updateThemeConfig({ instituteSlogan: e.target.value })}
+                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-950/70 border border-white/20 text-white focus:outline-rose-500 italic"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Custom Background Image & Presets */}
+            <div className="bg-slate-900/80 backdrop-blur-2xl border border-white/20 rounded-3xl p-6 text-white space-y-5 shadow-xl">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400">
+                    <ImageIcon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-sm text-white">Custom Background Wallpaper</h3>
+                    <p className="text-[11px] text-slate-400">Upload background or pick from curated Japanese presets</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Upload Background File */}
+              <div>
+                <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                  Upload Custom Background Image (High Resolution)
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={e => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = ev => {
+                        const dataUrl = ev.target?.result as string;
+                        if (dataUrl) {
+                          updateThemeConfig({ backgroundImageUrl: dataUrl });
+                          setThemeToast(`✓ Custom background "${file.name}" applied!`);
+                          setTimeout(() => setThemeToast(null), 3000);
+                        }
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  className="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-600 file:text-white hover:file:bg-amber-500 cursor-pointer p-1 rounded-xl bg-slate-950/70 border border-white/10"
+                />
+              </div>
+
+              {/* Curated Background Presets */}
+              <div className="space-y-2 pt-2">
+                <label className="block text-xs font-bold text-slate-300">
+                  Or Pick Curated Japanese & CBT Presets:
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {[
+                    {
+                      name: 'Tokyo Skyline',
+                      url: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=2000&q=80'
+                    },
+                    {
+                      name: 'Mount Fuji',
+                      url: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=2000&q=80'
+                    },
+                    {
+                      name: 'Prometric CBT',
+                      url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=2000&q=80'
+                    },
+                    {
+                      name: 'Kyoto Bamboo',
+                      url: 'https://images.unsplash.com/photo-1492571350019-22de08371fd3?auto=format&fit=crop&w=2000&q=80'
+                    },
+                    {
+                      name: 'Dark Obsidian',
+                      url: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=2000&q=80'
+                    },
+                    {
+                      name: 'Clean Slate Glass',
+                      url: ''
+                    }
+                  ].map(preset => (
+                    <button
+                      key={preset.name}
+                      type="button"
+                      onClick={() => {
+                        updateThemeConfig({ backgroundImageUrl: preset.url });
+                        setThemeToast(`✓ Applied preset wallpaper "${preset.name}"!`);
+                        setTimeout(() => setThemeToast(null), 3000);
+                      }}
+                      className={`p-2 rounded-xl text-left border transition text-xs flex flex-col justify-between h-16 ${
+                        themeConfig.backgroundImageUrl === preset.url
+                          ? 'border-amber-400 bg-amber-500/20 font-bold text-amber-200'
+                          : 'border-white/10 bg-white/5 hover:bg-white/10 text-slate-300'
+                      }`}
+                    >
+                      <span className="truncate">{preset.name}</span>
+                      <span className="text-[9px] text-slate-400">1-click apply</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Glassmorphic Transparency & Controls */}
+          <div className="bg-slate-900/80 backdrop-blur-2xl border border-white/20 rounded-3xl p-6 sm:p-8 text-white space-y-6 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                  <Sliders className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-base text-white">Full Transparency & Glass Styling Sliders</h3>
+                  <p className="text-xs text-slate-400">
+                    Real-time backdrop blur, surface opacity, and full transparency across all pop-ups, cards, and buttons
+                  </p>
+                </div>
+              </div>
+
+              <label className="flex items-center gap-2 cursor-pointer bg-white/10 px-3 py-1.5 rounded-xl border border-white/20 text-xs font-bold">
+                <input
+                  type="checkbox"
+                  checked={themeConfig.isGlassEnabled}
+                  onChange={e => updateThemeConfig({ isGlassEnabled: e.target.checked })}
+                  className="rounded text-rose-600 focus:ring-0"
+                />
+                <span>Glass Mode {themeConfig.isGlassEnabled ? 'Active' : 'Disabled'}</span>
+              </label>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Glass Opacity Slider */}
+              <div className="space-y-2 p-4 rounded-2xl bg-white/5 border border-white/10">
+                <div className="flex justify-between text-xs font-bold">
+                  <span>Glass Opacity</span>
+                  <span className="text-amber-400 font-mono">{themeConfig.glassOpacity}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="20"
+                  max="100"
+                  step="5"
+                  value={themeConfig.glassOpacity}
+                  onChange={e => updateThemeConfig({ glassOpacity: Number(e.target.value) })}
+                  className="w-full accent-amber-500 cursor-pointer"
+                />
+                <p className="text-[10px] text-slate-400">
+                  Controls the translucent background alpha across containers.
+                </p>
+              </div>
+
+              {/* Backdrop Blur Slider */}
+              <div className="space-y-2 p-4 rounded-2xl bg-white/5 border border-white/10">
+                <div className="flex justify-between text-xs font-bold">
+                  <span>Backdrop Blur Filter</span>
+                  <span className="text-rose-400 font-mono">{themeConfig.glassBlur}px</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="30"
+                  step="2"
+                  value={themeConfig.glassBlur}
+                  onChange={e => updateThemeConfig({ glassBlur: Number(e.target.value) })}
+                  className="w-full accent-rose-500 cursor-pointer"
+                />
+                <p className="text-[10px] text-slate-400">
+                  Gaussian blur strength applied to content behind glass panels.
+                </p>
+              </div>
+
+              {/* Full Transparency Across Elements Toggle */}
+              <div className="space-y-2 p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col justify-between">
+                <div className="flex justify-between text-xs font-bold">
+                  <span>Full Transparency Across Elements</span>
+                  <span className={themeConfig.fullTransparency ? 'text-emerald-400' : 'text-slate-400'}>
+                    {themeConfig.fullTransparency ? 'ENABLED' : 'OFF'}
+                  </span>
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer mt-1">
+                  <input
+                    type="checkbox"
+                    checked={themeConfig.fullTransparency}
+                    onChange={e => updateThemeConfig({ fullTransparency: e.target.checked })}
+                    className="rounded text-emerald-500"
+                  />
+                  <span className="text-xs text-slate-300 font-semibold">
+                    Apply glass transparency to all buttons, popups & modals
+                  </span>
+                </label>
+                <p className="text-[10px] text-slate-400">
+                  Removes opaque solid containers in favor of frosted glass panels.
+                </p>
+              </div>
+            </div>
+
+            {/* Live Interactive Glass Preview Widget */}
+            <div className="p-6 rounded-3xl bg-white/10 backdrop-blur-2xl border border-white/20 space-y-4 shadow-2xl">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-amber-300">
+                  Live Glassmorphic Component Sandbox
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-white border border-white/20">
+                  Real-Time Renderer
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Sample Glass Card */}
+                <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 space-y-2">
+                  <h5 className="font-bold text-xs text-white">Glass Card Container</h5>
+                  <p className="text-[11px] text-slate-200">
+                    Frosted card surface blending seamlessly with the custom background wallpaper.
+                  </p>
+                </div>
+
+                {/* Sample Glass Button Styles */}
+                <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 space-y-2">
+                  <h5 className="font-bold text-xs text-white">Glass Buttons</h5>
+                  <div className="flex flex-col gap-2">
+                    <button
+                      type="button"
+                      className="px-3 py-1.5 rounded-xl bg-rose-600/80 hover:bg-rose-500 backdrop-blur-md border border-white/20 text-white text-xs font-bold transition shadow-lg"
+                    >
+                      Primary Glass Button
+                    </button>
+                    <button
+                      type="button"
+                      className="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/20 text-white text-xs font-semibold transition"
+                    >
+                      Secondary Glass Button
+                    </button>
+                  </div>
+                </div>
+
+                {/* Sample Glass Pop-Up / Modal simulation */}
+                <div className="p-4 rounded-2xl bg-slate-950/70 backdrop-blur-2xl border border-white/30 space-y-2 shadow-2xl">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-emerald-300">Glass Pop-Up Dialog</span>
+                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300">Active</span>
+                  </div>
+                  <p className="text-[11px] text-slate-300">
+                    Modals, tooltips, and exam dialogs render with crystal clear blur and subtle borders.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* =========================================================================
           MODAL: MOCK TEST CONFIGURATION (Create / Edit)

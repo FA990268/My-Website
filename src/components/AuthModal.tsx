@@ -4,9 +4,9 @@ import { UserRole } from '../types';
 import { LogIn, UserPlus, Shield, Sparkles, Check, ArrowRight, GraduationCap } from 'lucide-react';
 
 export const AuthModal: React.FC = () => {
-  const { authModalOpen, setAuthModalOpen, loginUser, switchRole } = useApp();
+  const { authModalOpen, setAuthModalOpen, loginUser, switchRole, themeConfig } = useApp();
   const [tab, setTab] = useState<'signin' | 'register'>('signin');
-  const [email, setEmail] = useState('student@jftguru.com');
+  const [email, setEmail] = useState('student@daiichi.com');
   const [password, setPassword] = useState('password123');
   const [fullName, setFullName] = useState('Tanaka Kenji (田中 健二)');
   const [selectedRole, setSelectedRole] = useState<UserRole>('student');
@@ -52,18 +52,29 @@ export const AuthModal: React.FC = () => {
 
         {/* Modal Header */}
         <div className="text-center space-y-1">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-rose-600 to-amber-500 mx-auto flex items-center justify-center text-white shadow-lg shadow-rose-500/25 mb-2">
-            <svg className="w-7 h-7 fill-current" viewBox="0 0 24 24">
-              <path d="M2 5h20v2h-2v13h-2V7H6v13H4V7H2V5zm3-3h14v2H5V2zm1 7h12v2H6V9z" />
-            </svg>
-          </div>
+          {themeConfig.customLogoUrl ? (
+            <div className="mx-auto flex justify-center mb-2">
+              <img
+                src={themeConfig.customLogoUrl}
+                alt={themeConfig.instituteTitle}
+                className="h-12 w-auto object-contain rounded-xl p-0.5 bg-white shadow-md border border-slate-200"
+              />
+            </div>
+          ) : (
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-rose-600 to-amber-500 mx-auto flex items-center justify-center text-white shadow-lg shadow-rose-500/25 mb-2">
+              <svg className="w-7 h-7 fill-current" viewBox="0 0 24 24">
+                <path d="M2 5h20v2h-2v13h-2V7H6v13H4V7H2V5zm3-3h14v2H5V2zm1 7h12v2H6V9z" />
+              </svg>
+            </div>
+          )}
           <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-            {tab === 'signin' ? 'Welcome Back to JFT Guru' : 'Create Free Account'}
+            {themeConfig.instituteName}
           </h2>
-          <p className="text-xs text-slate-500">
-            {tab === 'signin'
-              ? 'Sign in to access your test history, study streak, and analytics.'
-              : 'Start practicing realistic Prometric CBT exams with 3 free mock tests.'}
+          <p className="text-xs font-bold text-rose-600">
+            {themeConfig.instituteTitle}
+          </p>
+          <p className="text-[11px] text-slate-500 italic">
+            {themeConfig.instituteSlogan}
           </p>
         </div>
 

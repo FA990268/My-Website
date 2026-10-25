@@ -7,7 +7,8 @@ import {
   SectionScore,
   SubscriptionTier,
   UserRole,
-  AppPermission
+  AppPermission,
+  ThemeConfig
 } from '../types';
 import {
   DEMO_ADMIN,
@@ -15,7 +16,8 @@ import {
   DEMO_STUDENT,
   INITIAL_MOCK_TESTS,
   INITIAL_QUESTIONS,
-  INITIAL_DEMO_ATTEMPT
+  INITIAL_DEMO_ATTEMPT,
+  DEFAULT_THEME_CONFIG
 } from '../lib/seedData';
 import { getQuestionsForTest } from '../lib/questionService';
 
@@ -43,6 +45,16 @@ interface AppContextType {
 
   // Navigation
   navigateTo: (view: string, params?: Record<string, string>) => void;
+
+  // Admin Authentication Gate & Role Security
+  isAdminAuthenticated: boolean;
+  adminLogin: (username: string, password: string) => { success: boolean; error?: string };
+  adminLogout: () => void;
+
+  // Theme & Glassy Branding Controls
+  themeConfig: ThemeConfig;
+  updateThemeConfig: (updates: Partial<ThemeConfig>) => void;
+  resetThemeConfig: () => void;
 
   // User & Demo
   switchRole: (role: UserRole, tier?: SubscriptionTier) => void;
@@ -85,10 +97,26 @@ const STORAGE_KEYS = {
   QUESTIONS: 'jft_cbt_questions_v2',
   ATTEMPTS: 'jft_cbt_attempts_v2',
   ACTIVE_ATTEMPT: 'jft_cbt_active_attempt_v2',
-  COOKIE_CONSENT: 'jft_cbt_cookie_consent_v2'
+  COOKIE_CONSENT: 'jft_cbt_cookie_consent_v2',
+  THEME_CONFIG: 'daiichi_theme_config_v1',
+  ADMIN_AUTH: 'daiichi_admin_authenticated'
 };
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // Theme Configuration
+  const [themeConfig, setThemeConfig] = useState<ThemeConfig>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.THEME_CONFIG);
+    return saved ? JSON.parse(saved) : DEFAULT_THEME_CONFIG;
+  });
+
+  // Admin User/Password Authentication Gate
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
+    return (
+      sessionStorage.getItem(STORAGE_KEYS.ADMIN_AUTH) === 'true' ||
+      localStorage.getItem(STORAGE_KEYS.ADMIN_AUTH) === 'true'
+    );
+  });
+
   // Load or initialize state
   const [currentUser, setCurrentUser] = useState<UserProfile>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
@@ -229,12 +257,83 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   }, [activeAttempt]);
 
-  // Demo user switcher
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.THEME_CONFIG, JSON.stringify(themeConfig));
+    document.documentElement.style.setProperty('--glass-opacity', `${themeConfig.glassOpacity / 100}`);
+    document.documentElement.style.setProperty('--glass-blur', `${themeConfig.glassBlur}px`);
+  }, [themeConfig]);
+
+  // Admin User/Password Authentication Methods
+  const adminLogin = (username: string, password: string): { success: boolean; error?: string } => {
+    const cleanUser = username.trim().toLowerCase();
+    const cleanPass = password.trim();
+
+    // Super Admin: admin@daiichi.com / admin123 (also accepts admin / daiichi2025)
+    if (
+      (cleanUser === 'admin@daiichi.com' || cleanUser === 'admin' || cleanUser === 'daiichi') &&
+      (cleanPass === 'admin123' || cleanPass === 'daiichi2025')
+    ) {
+      setIsAdminAuthenticated(true);
+      sessionStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, 'true');
+      localStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, 'true');
+      setCurrentUser(DEMO_ADMIN);
+      return { success: true };
+    }
+
+    // Teacher / Sensei: teacher@daiichi.com / teacher123 (also accepts sensei / sensei2025)
+    if (
+      (cleanUser === 'teacher@daiichi.com' || cleanUser === 'sensei' || cleanUser === 'teacher') &&
+      (cleanPass === 'teacher123' || cleanPass === 'sensei2025')
+    ) {
+      setIsAdminAuthenticated(true);
+      sessionStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, 'true');
+      localStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, 'true');
+      setCurrentUser(DEMO_TEACHER);
+      return { success: true };
+    }
+
+    return {
+      success: false,
+      error: 'Invalid administrator credentials. Access to Dai Ichi Academy CBT Control Center is denied.'
+    };
+  };
+
+  const adminLogout = () => {
+    setIsAdminAuthenticated(false);
+    sessionStorage.removeItem(STORAGE_KEYS.ADMIN_AUTH);
+    localStorage.removeItem(STORAGE_KEYS.ADMIN_AUTH);
+    setCurrentUser(DEMO_STUDENT);
+    navigateTo('landing');
+  };
+
+  // Theme Config Methods
+  const updateThemeConfig = (updates: Partial<ThemeConfig>) => {
+    setThemeConfig(prev => {
+      const next = { ...prev, ...updates };
+      localStorage.setItem(STORAGE_KEYS.THEME_CONFIG, JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const resetThemeConfig = () => {
+    setThemeConfig(DEFAULT_THEME_CONFIG);
+    localStorage.setItem(STORAGE_KEYS.THEME_CONFIG, JSON.stringify(DEFAULT_THEME_CONFIG));
+  };
+
+  // User switcher (Admin/Teacher requires password verification unless already authenticated)
   const switchRole = (role: UserRole, tier: SubscriptionTier = 'free') => {
     if (role === 'admin') {
-      setCurrentUser(DEMO_ADMIN);
+      if (isAdminAuthenticated) {
+        setCurrentUser(DEMO_ADMIN);
+      } else {
+        navigateTo('admin');
+      }
     } else if (role === 'teacher') {
-      setCurrentUser(DEMO_TEACHER);
+      if (isAdminAuthenticated) {
+        setCurrentUser(DEMO_TEACHER);
+      } else {
+        navigateTo('admin');
+      }
     } else {
       setCurrentUser({
         ...DEMO_STUDENT,
@@ -244,7 +343,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const canAccessAdmin = (): boolean => {
-    return currentUser.role === 'admin' || currentUser.role === 'teacher';
+    return isAdminAuthenticated && (currentUser.role === 'admin' || currentUser.role === 'teacher');
   };
 
   const hasPermission = (permission: AppPermission): boolean => {
@@ -611,6 +710,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         cookieConsent,
         setCookieConsent,
         navigateTo,
+        isAdminAuthenticated,
+        adminLogin,
+        adminLogout,
+        themeConfig,
+        updateThemeConfig,
+        resetThemeConfig,
         switchRole,
         toggleUserTier,
         loginUser,

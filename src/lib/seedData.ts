@@ -1,10 +1,23 @@
-import { MockTest, Question, UserProfile, ExamAttempt } from '../types';
+import { MockTest, Question, UserProfile, ExamAttempt, ThemeConfig } from '../types';
 import { ALL_MOCK_TESTS } from './mockTestsData';
+
+export const DEFAULT_THEME_CONFIG: ThemeConfig = {
+  customLogoUrl: '',
+  backgroundImageUrl: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=2000&q=80',
+  instituteName: 'DAI ICHI ACADEMY CBT',
+  instituteTitle: 'Dai Ichi Academy Khulna',
+  instituteSlogan: 'Japanese Language and Visa Consultancy',
+  isGlassEnabled: true,
+  glassOpacity: 70,
+  glassBlur: 16,
+  glassBorder: true,
+  fullTransparency: true
+};
 
 export const DEMO_ADMIN: UserProfile = {
   id: 'usr_admin_001',
-  full_name: 'Administrator (JFT Guru Master)',
-  email: 'admin@jftguru.com',
+  full_name: 'Administrator (Dai Ichi Academy Master)',
+  email: 'admin@daiichi.com',
   role: 'admin',
   subscription_tier: 'pro',
   credits: 999,
@@ -17,8 +30,8 @@ export const DEMO_ADMIN: UserProfile = {
 
 export const DEMO_TEACHER: UserProfile = {
   id: 'usr_teacher_001',
-  full_name: 'Yamamoto Sensei (山本 先生)',
-  email: 'teacher@jftguru.com',
+  full_name: 'Yamamoto Sensei (Dai Ichi Academy Khulna)',
+  email: 'teacher@daiichi.com',
   role: 'teacher',
   subscription_tier: 'pro',
   credits: 999,
@@ -32,7 +45,7 @@ export const DEMO_TEACHER: UserProfile = {
 export const DEMO_STUDENT: UserProfile = {
   id: 'usr_student_001',
   full_name: 'Tanaka Kenji (田中 健二)',
-  email: 'student@jftguru.com',
+  email: 'student@daiichi.com',
   role: 'student',
   subscription_tier: 'free',
   credits: 3,

@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { ShieldCheck, Heart, ExternalLink } from 'lucide-react';
 
 export const Footer: React.FC = () => {
-  const { navigateTo, setPricingModalOpen } = useApp();
+  const { navigateTo, setPricingModalOpen, themeConfig } = useApp();
   const [legalModalTitle, setLegalModalTitle] = useState<string | null>(null);
 
   const openLegalModal = (title: string) => {
@@ -12,23 +12,44 @@ export const Footer: React.FC = () => {
 
   return (
     <>
-      <footer className="bg-slate-900 text-slate-300 font-sans border-t border-slate-800 pt-16 pb-12">
+      <footer className="bg-slate-950/85 backdrop-blur-xl text-slate-300 font-sans border-t border-white/10 pt-16 pb-12 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-slate-800">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/10">
             {/* Column 1: Brand & Mission */}
             <div className="space-y-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-600 to-amber-500 flex items-center justify-center text-white font-black text-lg shadow-md shadow-rose-500/20">
-                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                    <path d="M2 5h20v2h-2v13h-2V7H6v13H4V7H2V5zm3-3h14v2H5V2zm1 7h12v2H6V9z" />
-                  </svg>
+                {themeConfig.customLogoUrl ? (
+                  <img
+                    src={themeConfig.customLogoUrl}
+                    alt={themeConfig.instituteTitle}
+                    className="w-10 h-10 object-contain rounded-xl p-0.5 bg-white shadow-xs"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 to-amber-500 flex items-center justify-center text-white font-black text-lg shadow-md shadow-rose-500/20">
+                    <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                      <path d="M2 5h20v2h-2v13h-2V7H6v13H4V7H2V5zm3-3h14v2H5V2zm1 7h12v2H6V9z" />
+                    </svg>
+                  </div>
+                )}
+                <div>
+                  <span className="font-extrabold text-xl text-white tracking-tight">
+                    DAI ICHI <span className="text-rose-500">ACADEMY</span>
+                  </span>
+                  <span className="ml-1 text-[10px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800/60">
+                    CBT
+                  </span>
                 </div>
-                <span className="font-extrabold text-xl text-white tracking-tight">
-                  JFT <span className="text-rose-500">GURU</span>
-                </span>
+              </div>
+              <div>
+                <p className="text-xs font-bold text-rose-400">
+                  {themeConfig.instituteTitle}
+                </p>
+                <p className="text-[11px] text-slate-400 italic">
+                  {themeConfig.instituteSlogan}
+                </p>
               </div>
               <p className="text-xs text-slate-400 leading-relaxed">
-                The premier all-in-one Computer-Based Testing (CBT) simulator and Japanese learning platform for JFT-Basic, SSW Tokutei技能 1号 skill tests, and JLPT N5–N1 candidates worldwide.
+                The premier Japanese language training academy and visa consultancy in Khulna. Offering official Computer-Based Testing (CBT) simulators for JFT-Basic, SSW Specified Skilled Worker Tokutei技能 1号, and JLPT candidates.
               </p>
               <div className="flex items-center gap-2 text-[11px] text-emerald-400 font-semibold bg-emerald-950/60 border border-emerald-800/60 px-3 py-1.5 rounded-lg w-fit">
                 <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -175,7 +196,7 @@ export const Footer: React.FC = () => {
           </div>
 
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-            <p>© 2026 JFT Guru (jftguru.com). All rights reserved.</p>
+            <p>© 2026 Dai Ichi Academy Khulna (DAI ICHI ACADEMY CBT). All rights reserved. Japanese Language and Visa Consultancy.</p>
             <p className="flex items-center gap-1">
               <span>Engineered with</span>
               <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 inline" />

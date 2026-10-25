@@ -1,15 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { UserRole } from '../types';
 import {
   ShieldAlert,
   Lock,
   ArrowRight,
-  UserCheck,
   Sparkles,
   Home,
   LayoutDashboard,
-  LogIn
+  KeyRound,
+  User,
+  AlertCircle,
+  CheckCircle2,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 interface AdminGuardProps {
@@ -21,135 +25,216 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({
   children,
   allowedRoles = ['admin', 'teacher']
 }) => {
-  const { currentUser, switchRole, navigateTo, setAuthModalOpen } = useApp();
+  const {
+    currentUser,
+    isAdminAuthenticated,
+    adminLogin,
+    navigateTo,
+    themeConfig
+  } = useApp();
 
-  const isAuthorized = allowedRoles.includes(currentUser.role);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // If already authenticated with credentials and has role, grant immediate access
+  const isAuthorized =
+    isAdminAuthenticated &&
+    allowedRoles.includes(currentUser.role);
 
   if (isAuthorized) {
     return <>{children}</>;
   }
 
-  // Unauthorized view for Students
+  const handleAuthSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage(null);
+    setIsSubmitting(true);
+
+    setTimeout(() => {
+      const result = adminLogin(username, password);
+      if (!result.success) {
+        setErrorMessage(result.error || 'Invalid credentials. Access denied.');
+      }
+      setIsSubmitting(false);
+    }, 400);
+  };
+
+  const fillCredentials = (roleType: 'admin' | 'teacher') => {
+    if (roleType === 'admin') {
+      setUsername('admin@daiichi.com');
+      setPassword('admin123');
+    } else {
+      setUsername('teacher@daiichi.com');
+      setPassword('teacher123');
+    }
+    setErrorMessage(null);
+  };
+
   return (
-    <div className="min-h-screen bg-[#090c15] text-slate-100 flex items-center justify-center p-4 sm:p-6 font-sans">
-      <div className="max-w-2xl w-full bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-md relative overflow-hidden">
-        {/* Subtle background glow */}
-        <div className="absolute -top-24 -right-24 w-60 h-60 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-60 h-60 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+    <div
+      className="min-h-screen text-slate-100 flex items-center justify-center p-4 sm:p-6 font-sans relative"
+      style={{
+        backgroundImage: themeConfig.backgroundImageUrl ? `url(${themeConfig.backgroundImageUrl})` : undefined,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+        backgroundColor: '#090c15'
+      }}
+    >
+      {/* Background glass overlay */}
+      <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md pointer-events-none" />
 
-        {/* Header with Lock Emblem */}
-        <div className="text-center space-y-3 relative z-10">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-red-600 to-rose-700 mx-auto flex items-center justify-center text-white shadow-xl shadow-red-600/30 border border-red-500/30">
-            <Lock className="w-8 h-8 text-white animate-pulse" />
+      <div className="max-w-md w-full bg-slate-900/80 border border-white/20 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-2xl relative z-10 space-y-6">
+        {/* Header with Custom Logo or Torii Emblem */}
+        <div className="text-center space-y-3">
+          {themeConfig.customLogoUrl ? (
+            <div className="mx-auto flex justify-center">
+              <img
+                src={themeConfig.customLogoUrl}
+                alt={themeConfig.instituteTitle}
+                className="h-16 w-auto object-contain rounded-xl p-1 bg-white/10 backdrop-blur-md border border-white/20 shadow-lg"
+              />
+            </div>
+          ) : (
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-rose-600 via-red-600 to-amber-500 mx-auto flex items-center justify-center text-white shadow-xl shadow-rose-600/30 border border-white/20">
+              <Lock className="w-7 h-7 text-white animate-pulse" />
+            </div>
+          )}
+
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-[10px] font-bold uppercase tracking-wider mb-1.5">
+              <ShieldAlert className="w-3 h-3" />
+              <span>Staff & Admin Password Authentication</span>
+            </div>
+            <h1 className="text-xl font-black text-white tracking-tight">
+              {themeConfig.instituteName}
+            </h1>
+            <p className="text-xs font-semibold text-rose-400 mt-0.5">
+              {themeConfig.instituteTitle}
+            </p>
+            <p className="text-[11px] text-slate-400 italic mt-0.5">
+              {themeConfig.instituteSlogan}
+            </p>
           </div>
-
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold uppercase tracking-wider">
-            <ShieldAlert className="w-3.5 h-3.5" />
-            <span>Staff Authorization Required • 講師・管理者専用</span>
-          </div>
-
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            Teacher & Admin Control Center
-          </h1>
-
-          <p className="text-sm text-slate-400 max-w-lg mx-auto leading-relaxed">
-            This workspace contains exam authoring tools, split-screen question paper setups, and Prometric CBT configurations. Access is restricted to educators, teachers, and system administrators.
-          </p>
         </div>
 
-        {/* Current User Session Status Card */}
-        <div className="my-6 p-4 rounded-2xl bg-slate-950/70 border border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 font-bold">
-              {currentUser.full_name?.charAt(0) || 'U'}
-            </div>
-            <div>
-              <div className="font-bold text-white flex items-center gap-2">
-                <span>{currentUser.full_name}</span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                  {currentUser.role}
-                </span>
-              </div>
-              <div className="text-slate-400 text-[11px]">{currentUser.email}</div>
+        {/* Password Authentication Form */}
+        <form onSubmit={handleAuthSubmit} className="space-y-4">
+          <div>
+            <label className="block text-[11px] font-bold text-slate-300 mb-1">
+              Administrator Username or Staff Email
+            </label>
+            <div className="relative">
+              <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                required
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+                placeholder="admin@daiichi.com"
+                className="w-full pl-9 pr-3.5 py-2.5 text-xs rounded-xl bg-slate-950/70 border border-white/20 text-white placeholder-slate-500 focus:outline-rose-500 transition"
+              />
             </div>
           </div>
 
-          <div className="text-red-400 text-[11px] font-semibold flex items-center gap-1">
-            <span>Status: Access Restricted</span>
+          <div>
+            <label className="block text-[11px] font-bold text-slate-300 mb-1">
+              Admin Password
+            </label>
+            <div className="relative">
+              <KeyRound className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full pl-9 pr-10 py-2.5 text-xs rounded-xl bg-slate-950/70 border border-white/20 text-white placeholder-slate-500 focus:outline-rose-500 transition"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* Quick Demo Switcher Options */}
-        <div className="space-y-3 pt-2">
-          <div className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-            <span>Fast Switch to Staff Account (Demo)</span>
+          {errorMessage && (
+            <div className="p-3 bg-red-950/60 border border-red-800/80 rounded-xl text-red-300 text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full py-3 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 active:scale-[0.98] text-white rounded-xl text-xs font-black shadow-lg shadow-rose-600/30 border border-white/20 transition flex items-center justify-center gap-2"
+          >
+            {isSubmitting ? (
+              <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+            ) : (
+              <>
+                <Lock className="w-3.5 h-3.5" />
+                <span>Verify Password & Access Admin Center</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </>
+            )}
+          </button>
+        </form>
+
+        {/* Credentials Assistant for Instant Testing */}
+        <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-white/10 space-y-2">
+          <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <span>Pre-Configured Staff Credentials</span>
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2 text-[10px]">
             <button
-              onClick={() => switchRole('teacher', 'pro')}
-              className="p-3.5 rounded-2xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-left transition group hover:scale-[1.02] active:scale-[0.98]"
+              type="button"
+              onClick={() => fillCredentials('admin')}
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition group"
             >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-extrabold text-amber-300 group-hover:text-amber-200">
-                  Yamamoto Sensei (山本 先生)
-                </span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 font-bold">
-                  Teacher
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400 mt-1">
-                Access test authoring, split-screen PDF setup, audio mapping, and student cohorts.
-              </p>
+              <div className="font-bold text-indigo-300 group-hover:text-indigo-200">Super Admin</div>
+              <div className="text-slate-400 font-mono text-[9px]">admin@daiichi.com</div>
+              <div className="text-slate-500 text-[9px]">Pass: admin123</div>
             </button>
 
             <button
-              onClick={() => switchRole('admin', 'pro')}
-              className="p-3.5 rounded-2xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-left transition group hover:scale-[1.02] active:scale-[0.98]"
+              type="button"
+              onClick={() => fillCredentials('teacher')}
+              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition group"
             >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-extrabold text-indigo-300 group-hover:text-indigo-200">
-                  Administrator (Master)
-                </span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-400/20 text-indigo-300 font-bold">
-                  Super Admin
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400 mt-1">
-                Full system control: student subscription management, database backups, and exam deletion.
-              </p>
+              <div className="font-bold text-amber-300 group-hover:text-amber-200">Teacher / Sensei</div>
+              <div className="text-slate-400 font-mono text-[9px]">teacher@daiichi.com</div>
+              <div className="text-slate-500 text-[9px]">Pass: teacher123</div>
             </button>
           </div>
         </div>
 
-        {/* Action Links */}
-        <div className="mt-8 pt-6 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+        {/* Navigation Actions */}
+        <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs">
           <button
-            onClick={() => setAuthModalOpen(true)}
-            className="text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1.5 transition"
+            onClick={() => navigateTo('dashboard')}
+            className="text-slate-400 hover:text-white flex items-center gap-1.5 transition text-[11px]"
           >
-            <LogIn className="w-3.5 h-3.5 text-rose-400" />
-            <span>Sign in with Staff Credentials</span>
+            <LayoutDashboard className="w-3.5 h-3.5" />
+            <span>Student Dashboard</span>
           </button>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => navigateTo('dashboard')}
-              className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition flex items-center gap-1.5"
-            >
-              <LayoutDashboard className="w-3.5 h-3.5 text-slate-400" />
-              <span>Student Dashboard</span>
-            </button>
-
-            <button
-              onClick={() => navigateTo('landing')}
-              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-xs font-bold text-white transition flex items-center gap-1.5 shadow-md shadow-rose-600/30"
-            >
-              <Home className="w-3.5 h-3.5" />
-              <span>Back to Home</span>
-            </button>
-          </div>
+          <button
+            onClick={() => navigateTo('landing')}
+            className="text-slate-400 hover:text-white flex items-center gap-1.5 transition text-[11px]"
+          >
+            <Home className="w-3.5 h-3.5" />
+            <span>Back to Home</span>
+          </button>
         </div>
       </div>
     </div>
