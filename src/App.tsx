@@ -7,6 +7,7 @@ import { AuthModal } from './components/AuthModal';
 import { PricingModal } from './components/PricingModal';
 import { VideoDemoModal } from './components/VideoDemoModal';
 import { DemoToolbar } from './components/DemoToolbar';
+import { AdminGuard } from './components/AdminGuard';
 
 // Views
 import { LandingPage } from './views/LandingPage';
@@ -48,9 +49,11 @@ export function App() {
         {currentView === 'institutes' && <ForInstitutes />}
         {currentView === 'blog' && <BlogPage />}
         {currentView === 'admin' && (
-          <div className="min-h-screen w-full bg-[#090c15]">
-            <AdminPanel />
-          </div>
+          <AdminGuard allowedRoles={['admin', 'teacher']}>
+            <div className="min-h-screen w-full bg-[#090c15]">
+              <AdminPanel />
+            </div>
+          </AdminGuard>
         )}
         {currentView === 'dashboard' && (
           <div className="min-h-screen bg-slate-50 p-4 md:p-8">

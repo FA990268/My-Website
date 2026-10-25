@@ -10,6 +10,22 @@ export const DEMO_ADMIN: UserProfile = {
   credits: 999,
   streak: 14,
   bookmarked_questions: ['q_s3_28', 'q_s4_41'],
+  avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
+  permissions: ['manage_tests', 'manage_questions', 'view_analytics', 'manage_students', 'manage_storage', 'system_admin'],
+  created_at: new Date().toISOString()
+};
+
+export const DEMO_TEACHER: UserProfile = {
+  id: 'usr_teacher_001',
+  full_name: 'Yamamoto Sensei (山本 先生)',
+  email: 'teacher@jftguru.com',
+  role: 'teacher',
+  subscription_tier: 'pro',
+  credits: 999,
+  streak: 21,
+  bookmarked_questions: ['q_s1_01', 'q_s3_28'],
+  avatar_url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150',
+  permissions: ['manage_tests', 'manage_questions', 'view_analytics', 'manage_storage'],
   created_at: new Date().toISOString()
 };
 
@@ -22,6 +38,8 @@ export const DEMO_STUDENT: UserProfile = {
   credits: 3,
   streak: 7,
   bookmarked_questions: ['q_s3_28', 'q_s4_41'],
+  avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+  permissions: ['take_tests', 'view_own_results', 'manage_own_bookmarks'],
   created_at: new Date().toISOString()
 };
 

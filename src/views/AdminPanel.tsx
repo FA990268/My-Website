@@ -5,7 +5,9 @@ import {
   Question,
   QuestionMode,
   SECTIONS_CONFIG,
-  ExamCategory
+  ExamCategory,
+  StorageBucket,
+  CloudFileItem
 } from '../types';
 import { renderFurigana } from '../lib/furigana';
 import { RestrictedAudioPlayer } from '../components/RestrictedAudioPlayer';
@@ -30,10 +32,22 @@ import {
   Lock,
   Download,
   Check,
-  Columns
+  Columns,
+  Database,
+  HardDrive,
+  Server,
+  ShieldAlert,
+  GraduationCap
 } from 'lucide-react';
 import { AdminSplitScreenEditor } from '../components/AdminSplitScreenEditor';
 import { AdminSetupPanel } from '../components/AdminSetupPanel';
+import {
+  getCloudStorageStatus,
+  uploadFileToBucket,
+  deleteStoredFile,
+  getStoredFiles
+} from '../lib/storageService';
+import { getDatabaseStatus } from '../lib/dbService';
 
 export const AdminPanel: React.FC = () => {
   const {
@@ -53,10 +67,17 @@ export const AdminPanel: React.FC = () => {
     startExam
   } = useApp();
 
-  const [activeAdminTab, setActiveAdminTab] = useState<'setup' | 'overview' | 'split-screen' | 'tests' | 'questions' | 'users' | 'import'>('setup');
+  const [activeAdminTab, setActiveAdminTab] = useState<'setup' | 'overview' | 'split-screen' | 'tests' | 'questions' | 'users' | 'import' | 'storage'>('setup');
   const [selectedTestId, setSelectedTestId] = useState<string>(mockTests[0]?.id || 'test_jft_01');
   const [selectedSectionNumber, setSelectedSectionNumber] = useState<1 | 2 | 3 | 4>(1);
   const [userSearchTerm, setUserSearchTerm] = useState<string>('');
+
+  // Cloud Storage & Database State
+  const [storageBucketSelect, setStorageBucketSelect] = useState<StorageBucket>('exam-pdfs');
+  const [uploadTestFile, setUploadTestFile] = useState<File | null>(null);
+  const [isUploadingFile, setIsUploadingFile] = useState<boolean>(false);
+  const [storageFeedbackMessage, setStorageFeedbackMessage] = useState<string | null>(null);
+  const [storageRefreshKey, setStorageRefreshKey] = useState<number>(0);
 
   // Test Modal State (Create / Edit)
   const [isTestModalOpen, setIsTestModalOpen] = useState<boolean>(false);
@@ -171,13 +192,28 @@ export const AdminPanel: React.FC = () => {
       {/* Admin Panel Header */}
       <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl">
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>Master Administration & Question Management Portal</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>Master Administration & Question Management Portal</span>
+            </div>
+
+            {currentUser.role === 'admin' ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-600/30 text-indigo-200 border border-indigo-500/40">
+                <ShieldAlert className="w-3.5 h-3.5 text-indigo-400" />
+                <span>Super Admin • Full Master Access</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                <GraduationCap className="w-3.5 h-3.5 text-amber-400" />
+                <span>Teacher: {currentUser.full_name} • Curriculum Author</span>
+              </span>
+            )}
           </div>
+
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight">Admin & Teacher Control Center</h1>
           <p className="text-xs sm:text-sm text-slate-300">
-            Configure CBT mock sets, author questions with audio/passages, manage student subscriptions, and bulk import items.
+            Configure CBT mock sets, author questions with audio/passages, manage student subscriptions, and monitor cloud storage.
           </p>
         </div>
 
@@ -235,6 +271,15 @@ export const AdminPanel: React.FC = () => {
             }`}
           >
             Students
+          </button>
+          <button
+            onClick={() => setActiveAdminTab('storage')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+              activeAdminTab === 'storage' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
+            }`}
+          >
+            <Database className="w-3.5 h-3.5" />
+            <span>Storage & DB</span>
           </button>
           <button
             onClick={() => setActiveAdminTab('import')}
@@ -592,10 +637,24 @@ export const AdminPanel: React.FC = () => {
           ========================================================================= */}
       {activeAdminTab === 'users' && (
         <div className="bg-white rounded-3xl border border-slate-200 shadow-xs p-6 space-y-4">
+          {currentUser.role === 'teacher' && (
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center gap-3 text-xs text-amber-900">
+              <GraduationCap className="w-5 h-5 shrink-0 text-amber-600" />
+              <div>
+                <span className="font-bold">Educator View Mode:</span> You are viewing registered student candidates as{' '}
+                <strong>{currentUser.full_name} (Teacher)</strong>. Modifying subscription tiers and student billing is reserved for Super Administrators. You have full authoring privileges for tests, sections, audio mapping, and questions.
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h3 className="text-base font-extrabold text-slate-900">Student Subscription & Role Management</h3>
-              <p className="text-xs text-slate-500">1-click tier promoter for candidate accounts</p>
+              <h3 className="text-base font-extrabold text-slate-900">Student Profiles & Role Directory</h3>
+              <p className="text-xs text-slate-500">
+                {currentUser.role === 'admin'
+                  ? 'Manage candidate subscription tiers and account roles'
+                  : 'View student candidate registrations and cohort rosters'}
+              </p>
             </div>
             <div className="relative w-64">
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -632,12 +691,18 @@ export const AdminPanel: React.FC = () => {
                       </span>
                     </td>
                     <td className="py-3 px-4 text-right">
-                      <button
-                        onClick={() => toggleUserTier(user.id)}
-                        className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition"
-                      >
-                        {user.subscription_tier === 'pro' ? 'Switch to Free' : 'Promote to PRO'}
-                      </button>
+                      {currentUser.role === 'admin' ? (
+                        <button
+                          onClick={() => toggleUserTier(user.id)}
+                          className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition"
+                        >
+                          {user.subscription_tier === 'pro' ? 'Switch to Free' : 'Promote to PRO'}
+                        </button>
+                      ) : (
+                        <span className="text-[10px] text-slate-400 font-medium italic">
+                          Admin required
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -776,6 +841,367 @@ export const AdminPanel: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* =========================================================================
+          TAB 6: CLOUD STORAGE & DATABASE MANAGEMENT
+          ========================================================================= */}
+      {activeAdminTab === 'storage' && (() => {
+        const dbStatus = getDatabaseStatus();
+        const storageStatus = getCloudStorageStatus();
+        const registeredFiles = getStoredFiles();
+
+        const handleUploadTestFileSubmit = async (e: React.FormEvent) => {
+          e.preventDefault();
+          if (!uploadTestFile) {
+            setStorageFeedbackMessage('Please select a file to upload.');
+            return;
+          }
+
+          setIsUploadingFile(true);
+          setStorageFeedbackMessage(null);
+
+          try {
+            const res = await uploadFileToBucket(storageBucketSelect, uploadTestFile, {
+              uploadedBy: currentUser.full_name
+            });
+            setStorageFeedbackMessage(`✓ File "${uploadTestFile.name}" uploaded successfully to bucket [${storageBucketSelect}]! URL: ${res.url.substring(0, 40)}...`);
+            setUploadTestFile(null);
+            setStorageRefreshKey(k => k + 1);
+          } catch (err: any) {
+            setStorageFeedbackMessage(`Upload error: ${err.message}`);
+          } finally {
+            setIsUploadingFile(false);
+          }
+        };
+
+        const handleDeleteFile = async (bucket: StorageBucket, fileId: string) => {
+          await deleteStoredFile(bucket, fileId);
+          setStorageRefreshKey(k => k + 1);
+        };
+
+        return (
+          <div className="space-y-6">
+            {/* Database & Cloud Storage Status Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Database Status Card */}
+              <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600">
+                        <Database className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-sm text-slate-900">Database Engine</h4>
+                        <p className="text-[11px] text-slate-500">PostgreSQL Schema & RLS</p>
+                      </div>
+                    </div>
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                      dbStatus.isConnected
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        : 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                    }`}>
+                      {dbStatus.isConnected ? 'Cloud Live' : 'Offline / Standalone'}
+                    </span>
+                  </div>
+
+                  <div className="pt-2 text-xs text-slate-600 space-y-1">
+                    <div className="flex justify-between py-1 border-b border-slate-100">
+                      <span className="text-slate-400">Provider:</span>
+                      <strong className="text-slate-800">{dbStatus.provider}</strong>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-slate-100">
+                      <span className="text-slate-400">Total Mock Tests:</span>
+                      <strong className="text-slate-800">{dbStatus.testsCount} tests</strong>
+                    </div>
+                    <div className="flex justify-between py-1">
+                      <span className="text-slate-400">Total Questions:</span>
+                      <strong className="text-slate-800">{dbStatus.questionsCount} items</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-400">
+                  SQL schema definitions verified in <code className="bg-slate-100 px-1 py-0.5 rounded text-indigo-600">supabase/schema.sql</code>
+                </div>
+              </div>
+
+              {/* Cloud Storage Status Card */}
+              <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-10 h-10 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600">
+                        <HardDrive className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-sm text-slate-900">Cloud Storage Hub</h4>
+                        <p className="text-[11px] text-slate-500">PDFs, Audios, Stimulus Graphics</p>
+                      </div>
+                    </div>
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                      storageStatus.isCloudConnected
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        : 'bg-rose-50 text-rose-700 border border-rose-200'
+                    }`}>
+                      {storageStatus.isCloudConnected ? 'Cloud Active' : 'Hybrid Local Cache'}
+                    </span>
+                  </div>
+
+                  <div className="pt-2 text-xs text-slate-600 space-y-1">
+                    <div className="flex justify-between py-1 border-b border-slate-100">
+                      <span className="text-slate-400">Storage Engine:</span>
+                      <strong className="text-slate-800">{storageStatus.provider}</strong>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-slate-100">
+                      <span className="text-slate-400">Total Uploaded Items:</span>
+                      <strong className="text-slate-800">{storageStatus.totalFiles} files</strong>
+                    </div>
+                    <div className="flex justify-between py-1">
+                      <span className="text-slate-400">Total Transferred Volume:</span>
+                      <strong className="text-slate-800">
+                        {(storageStatus.totalBytes / (1024 * 1024)).toFixed(2)} MB
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-400">
+                  Protected with Supabase Storage RLS & Staff verification
+                </div>
+              </div>
+            </div>
+
+            {/* Cloud Storage Buckets Grid */}
+            <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-4">
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900">Configured Storage Buckets</h3>
+                <p className="text-xs text-slate-500">
+                  5 dedicated storage buckets with role-based policies and format validation
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                {(
+                  [
+                    {
+                      key: 'exam-pdfs',
+                      name: 'exam-pdfs',
+                      title: 'Exam Question PDFs',
+                      desc: 'Split-screen master question papers',
+                      icon: FileText,
+                      limit: '50MB'
+                    },
+                    {
+                      key: 'audio-tracks',
+                      name: 'audio-tracks',
+                      title: 'Listening Audio',
+                      desc: 'Audio tracks & sequential auto-mapping',
+                      icon: Volume2,
+                      limit: '30MB'
+                    },
+                    {
+                      key: 'stimulus-images',
+                      name: 'stimulus-images',
+                      title: 'Stimulus Images',
+                      desc: 'Signage, posters, and visual memos',
+                      icon: ImageIcon,
+                      limit: '10MB'
+                    },
+                    {
+                      key: 'documents',
+                      name: 'documents',
+                      title: 'Documents & E-Books',
+                      desc: 'Certificates and study guides',
+                      icon: BookOpen,
+                      limit: '25MB'
+                    },
+                    {
+                      key: 'user-avatars',
+                      name: 'user-avatars',
+                      title: 'User Avatars',
+                      desc: 'Candidate and educator profile images',
+                      icon: Users,
+                      limit: '5MB'
+                    }
+                  ] as const
+                ).map(b => {
+                  const Icon = b.icon;
+                  const stats = storageStatus.buckets[b.key];
+                  return (
+                    <div
+                      key={b.key}
+                      className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-slate-100/80 transition space-y-2 flex flex-col justify-between"
+                    >
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 shadow-2xs">
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <span className="text-[10px] font-bold text-slate-400">Max {b.limit}</span>
+                        </div>
+                        <h5 className="font-extrabold text-xs text-slate-900">{b.title}</h5>
+                        <p className="text-[10px] text-slate-500 leading-tight">{b.desc}</p>
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px]">
+                        <span className="font-mono text-slate-400">bucket:</span>
+                        <strong className="text-slate-800">{stats ? stats.count : 0} files</strong>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Interactive File Uploader & Storage Tester */}
+            <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-4">
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900">Direct Cloud Bucket Uploader</h3>
+                <p className="text-xs text-slate-500">
+                  Upload documents, question PDFs, or audio tracks directly to your storage bucket
+                </p>
+              </div>
+
+              <form onSubmit={handleUploadTestFileSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Target Storage Bucket</label>
+                  <select
+                    value={storageBucketSelect}
+                    onChange={e => setStorageBucketSelect(e.target.value as StorageBucket)}
+                    className="w-full p-2.5 rounded-xl border border-slate-300 text-xs focus:outline-rose-500 bg-white"
+                  >
+                    <option value="exam-pdfs">exam-pdfs (Question Papers)</option>
+                    <option value="audio-tracks">audio-tracks (Listening Audio)</option>
+                    <option value="stimulus-images">stimulus-images (Graphics & Signs)</option>
+                    <option value="documents">documents (Guides & Reports)</option>
+                    <option value="user-avatars">user-avatars (Profile Avatars)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Select File to Upload</label>
+                  <input
+                    type="file"
+                    onChange={e => {
+                      if (e.target.files?.[0]) {
+                        setUploadTestFile(e.target.files[0]);
+                        setStorageFeedbackMessage(null);
+                      }
+                    }}
+                    className="w-full text-xs text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer"
+                  />
+                </div>
+
+                <div className="flex items-end">
+                  <button
+                    type="submit"
+                    disabled={isUploadingFile || !uploadTestFile}
+                    className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white transition flex items-center justify-center gap-2 shadow-md ${
+                      isUploadingFile || !uploadTestFile
+                        ? 'bg-slate-300 cursor-not-allowed'
+                        : 'bg-rose-600 hover:bg-rose-500 shadow-rose-600/30'
+                    }`}
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>{isUploadingFile ? 'Uploading File...' : 'Upload to Cloud Bucket'}</span>
+                  </button>
+                </div>
+              </form>
+
+              {storageFeedbackMessage && (
+                <div className={`p-3 rounded-xl text-xs font-medium ${
+                  storageFeedbackMessage.startsWith('✓')
+                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                    : 'bg-rose-50 text-rose-800 border border-rose-200'
+                }`}>
+                  {storageFeedbackMessage}
+                </div>
+              )}
+            </div>
+
+            {/* Storage Registry Table */}
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-xs p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900">Cloud Storage File Registry</h3>
+                  <p className="text-xs text-slate-500">Live directory of uploaded files, documents, and assets</p>
+                </div>
+                <span className="text-xs font-bold text-slate-500">
+                  {registeredFiles.length} registered assets
+                </span>
+              </div>
+
+              {registeredFiles.length === 0 ? (
+                <div className="p-8 text-center text-slate-400 text-xs border border-dashed border-slate-200 rounded-2xl">
+                  No files uploaded to the registry yet. Use the uploader above or the Admin Setup panel to attach exam papers and audio files.
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold border-y border-slate-200">
+                      <tr>
+                        <th className="py-3 px-4">File Name</th>
+                        <th className="py-3 px-4">Bucket</th>
+                        <th className="py-3 px-4">Size</th>
+                        <th className="py-3 px-4">Uploaded At</th>
+                        <th className="py-3 px-4">Uploader</th>
+                        <th className="py-3 px-4 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                      {registeredFiles.map(file => (
+                        <tr key={file.id} className="hover:bg-slate-50 transition">
+                          <td className="py-3 px-4 font-bold text-slate-900 flex items-center gap-2">
+                            {file.bucket === 'exam-pdfs' ? (
+                              <FileText className="w-4 h-4 text-red-500 shrink-0" />
+                            ) : file.bucket === 'audio-tracks' ? (
+                              <Volume2 className="w-4 h-4 text-blue-500 shrink-0" />
+                            ) : (
+                              <ImageIcon className="w-4 h-4 text-emerald-500 shrink-0" />
+                            )}
+                            <span className="truncate max-w-xs">{file.name}</span>
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-700">
+                              {file.bucket}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-slate-500">
+                            {(file.size / 1024).toFixed(1)} KB
+                          </td>
+                          <td className="py-3 px-4 text-slate-400 text-[11px]">
+                            {new Date(file.uploaded_at).toLocaleString()}
+                          </td>
+                          <td className="py-3 px-4 text-slate-600">
+                            {file.uploaded_by || 'Admin'}
+                          </td>
+                          <td className="py-3 px-4 text-right space-x-2">
+                            <a
+                              href={file.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-block px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold"
+                            >
+                              View / Download
+                            </a>
+                            <button
+                              onClick={() => handleDeleteFile(file.bucket, file.id)}
+                              className="px-2 py-1 rounded text-red-600 hover:bg-red-50 text-xs font-semibold"
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* =========================================================================
           MODAL: MOCK TEST CONFIGURATION (Create / Edit)

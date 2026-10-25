@@ -6,10 +6,12 @@ import {
   ExamAttempt,
   SectionScore,
   SubscriptionTier,
-  UserRole
+  UserRole,
+  AppPermission
 } from '../types';
 import {
   DEMO_ADMIN,
+  DEMO_TEACHER,
   DEMO_STUDENT,
   INITIAL_MOCK_TESTS,
   INITIAL_QUESTIONS,
@@ -50,6 +52,8 @@ interface AppContextType {
   upgradePlan: (tier: SubscriptionTier) => void;
   toggleBookmarkQuestion: (questionId: string) => void;
   resetAllData: () => void;
+  canAccessAdmin: () => boolean;
+  hasPermission: (permission: AppPermission) => boolean;
 
   // Mock Tests CRUD
   createMockTest: (data: Omit<MockTest, 'id' | 'created_at'>) => MockTest;
@@ -93,7 +97,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const [allUsers, setAllUsers] = useState<UserProfile[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.USERS);
-    return saved ? JSON.parse(saved) : [DEMO_ADMIN, DEMO_STUDENT];
+    return saved ? JSON.parse(saved) : [DEMO_ADMIN, DEMO_TEACHER, DEMO_STUDENT];
   });
 
   const [mockTests, setMockTests] = useState<MockTest[]>(() => {
@@ -229,12 +233,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const switchRole = (role: UserRole, tier: SubscriptionTier = 'free') => {
     if (role === 'admin') {
       setCurrentUser(DEMO_ADMIN);
+    } else if (role === 'teacher') {
+      setCurrentUser(DEMO_TEACHER);
     } else {
       setCurrentUser({
         ...DEMO_STUDENT,
         subscription_tier: tier
       });
     }
+  };
+
+  const canAccessAdmin = (): boolean => {
+    return currentUser.role === 'admin' || currentUser.role === 'teacher';
+  };
+
+  const hasPermission = (permission: AppPermission): boolean => {
+    if (currentUser.role === 'admin') return true;
+    return currentUser.permissions?.includes(permission) ?? false;
   };
 
   const toggleUserTier = (userId: string) => {
@@ -271,20 +286,31 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     });
   };
 
-  const loginUser = (email: string, role: UserRole = 'student') => {
-    const existing = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+  const loginUser = (email: string, role?: UserRole) => {
+    const cleanEmail = email.toLowerCase();
+    const existing = allUsers.find(u => u.email.toLowerCase() === cleanEmail);
     if (existing) {
       setCurrentUser(existing);
     } else {
+      const inferredRole: UserRole = role || (
+        cleanEmail.includes('admin') ? 'admin' :
+        cleanEmail.includes('teacher') || cleanEmail.includes('sensei') ? 'teacher' : 'student'
+      );
+      const isStaff = inferredRole === 'admin' || inferredRole === 'teacher';
       const newUser: UserProfile = {
         id: `usr_${Date.now()}`,
         full_name: email.split('@')[0],
         email,
-        role,
-        subscription_tier: role === 'admin' ? 'pro' : 'free',
-        credits: role === 'admin' ? 999 : 3,
+        role: inferredRole,
+        subscription_tier: isStaff ? 'pro' : 'free',
+        credits: isStaff ? 999 : 3,
         streak: 5,
         bookmarked_questions: [],
+        permissions: inferredRole === 'admin'
+          ? ['manage_tests', 'manage_questions', 'view_analytics', 'manage_students', 'manage_storage', 'system_admin']
+          : inferredRole === 'teacher'
+          ? ['manage_tests', 'manage_questions', 'view_analytics', 'manage_storage']
+          : ['take_tests', 'view_own_results', 'manage_own_bookmarks'],
         created_at: new Date().toISOString()
       };
       setAllUsers(prev => [...prev, newUser]);
@@ -302,7 +328,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const resetAllData = () => {
     localStorage.clear();
     setCurrentUser(DEMO_STUDENT);
-    setAllUsers([DEMO_ADMIN, DEMO_STUDENT]);
+    setAllUsers([DEMO_ADMIN, DEMO_TEACHER, DEMO_STUDENT]);
     setMockTests(INITIAL_MOCK_TESTS);
     setQuestions(INITIAL_QUESTIONS);
     setAttempts([INITIAL_DEMO_ATTEMPT]);
@@ -592,6 +618,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         upgradePlan,
         toggleBookmarkQuestion,
         resetAllData,
+        canAccessAdmin,
+        hasPermission,
         createMockTest,
         updateMockTest,
         deleteMockTest,

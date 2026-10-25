@@ -1,6 +1,35 @@
-export type UserRole = 'student' | 'admin';
+export type UserRole = 'student' | 'teacher' | 'admin';
 export type SubscriptionTier = 'free' | 'trial' | 'monthly' | 'confidence' | 'pro';
 export type QuestionMode = 'text_image' | 'pdf_view' | 'audio_mcq';
+
+export type AppPermission =
+  | 'take_tests'
+  | 'view_own_results'
+  | 'manage_own_bookmarks'
+  | 'manage_tests'
+  | 'manage_questions'
+  | 'view_analytics'
+  | 'manage_storage'
+  | 'manage_students'
+  | 'system_admin';
+
+export type StorageBucket =
+  | 'exam-pdfs'
+  | 'audio-tracks'
+  | 'stimulus-images'
+  | 'documents'
+  | 'user-avatars';
+
+export interface CloudFileItem {
+  id: string;
+  bucket: StorageBucket;
+  name: string;
+  size: number;
+  mime_type: string;
+  url: string;
+  uploaded_at: string;
+  uploaded_by?: string;
+}
 
 export type ExamCategory =
   | 'JFT Basic'
@@ -21,6 +50,8 @@ export interface UserProfile {
   credits: number;
   streak: number;
   bookmarked_questions: string[];
+  avatar_url?: string;
+  permissions?: AppPermission[];
   created_at: string;
 }
 

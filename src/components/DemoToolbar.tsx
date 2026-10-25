@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { ShieldCheck, User, Sparkles, RotateCcw, Monitor, FileSpreadsheet, Layers } from 'lucide-react';
+import { ShieldCheck, User, Sparkles, RotateCcw, Monitor, FileSpreadsheet, Layers, GraduationCap } from 'lucide-react';
 
 export const DemoToolbar: React.FC = () => {
   const {
@@ -55,13 +55,26 @@ export const DemoToolbar: React.FC = () => {
           onClick={() => switchRole('student', 'pro')}
           className={`px-2.5 py-1 rounded transition flex items-center gap-1.5 font-medium ${
             currentUser.role === 'student' && currentUser.subscription_tier === 'pro'
-              ? 'bg-amber-600 text-white shadow'
+              ? 'bg-rose-600 text-white shadow'
               : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
           }`}
           title="Switch to Student with Pro Tier"
         >
-          <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+          <Sparkles className="w-3.5 h-3.5 text-rose-300" />
           <span>Student (Pro)</span>
+        </button>
+
+        <button
+          onClick={() => switchRole('teacher', 'pro')}
+          className={`px-2.5 py-1 rounded transition flex items-center gap-1.5 font-medium ${
+            currentUser.role === 'teacher'
+              ? 'bg-amber-600 text-white shadow'
+              : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+          }`}
+          title="Switch to Teacher / Sensei (Curriculum & Test Author)"
+        >
+          <GraduationCap className="w-3.5 h-3.5 text-amber-300" />
+          <span>Teacher (Sensei)</span>
         </button>
 
         <button
@@ -71,7 +84,7 @@ export const DemoToolbar: React.FC = () => {
               ? 'bg-indigo-600 text-white shadow'
               : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
           }`}
-          title="Switch to Admin CMS"
+          title="Switch to Super Admin CMS"
         >
           <ShieldCheck className="w-3.5 h-3.5 text-indigo-300" />
           <span>Admin (CMS)</span>

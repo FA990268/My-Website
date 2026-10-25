@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { LogIn, UserPlus, Shield, Sparkles, Check, ArrowRight } from 'lucide-react';
+import { UserRole } from '../types';
+import { LogIn, UserPlus, Shield, Sparkles, Check, ArrowRight, GraduationCap } from 'lucide-react';
 
 export const AuthModal: React.FC = () => {
   const { authModalOpen, setAuthModalOpen, loginUser, switchRole } = useApp();
@@ -8,17 +9,31 @@ export const AuthModal: React.FC = () => {
   const [email, setEmail] = useState('student@jftguru.com');
   const [password, setPassword] = useState('password123');
   const [fullName, setFullName] = useState('Tanaka Kenji (田中 健二)');
+  const [selectedRole, setSelectedRole] = useState<UserRole>('student');
+  const [teacherPasskey, setTeacherPasskey] = useState('');
+  const [passkeyError, setPasskeyError] = useState<string | null>(null);
 
   if (!authModalOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    loginUser(email, email.includes('admin') ? 'admin' : 'student');
+    setPasskeyError(null);
+
+    if (tab === 'register' && selectedRole === 'teacher') {
+      if (teacherPasskey && teacherPasskey !== 'SENSEI2025' && teacherPasskey !== 'GURU-TEACHER') {
+        setPasskeyError('Invalid Educator Passkey. For demo testing, use "SENSEI2025" or leave blank.');
+        return;
+      }
+    }
+
+    loginUser(email, tab === 'register' ? selectedRole : undefined);
   };
 
-  const handleQuickAccount = (type: 'student' | 'admin') => {
+  const handleQuickAccount = (type: UserRole) => {
     if (type === 'student') {
       switchRole('student', 'free');
+    } else if (type === 'teacher') {
+      switchRole('teacher', 'pro');
     } else {
       switchRole('admin', 'pro');
     }
@@ -27,7 +42,7 @@ export const AuthModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 space-y-5 shadow-2xl animate-in fade-in zoom-in-95 font-sans relative">
+      <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-5 shadow-2xl animate-in fade-in zoom-in-95 font-sans relative max-h-[95vh] overflow-y-auto">
         <button
           onClick={() => setAuthModalOpen(false)}
           className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold transition"
@@ -58,22 +73,30 @@ export const AuthModal: React.FC = () => {
             <span>Fast 1-Click Demo Access</span>
             <Sparkles className="w-3 h-3 text-amber-500" />
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <button
               type="button"
               onClick={() => handleQuickAccount('student')}
-              className="px-3 py-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-left text-xs transition shadow-2xs group"
+              className="px-2.5 py-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-left text-xs transition shadow-2xs group"
             >
-              <div className="font-bold text-slate-900 group-hover:text-rose-600">Student Profile</div>
-              <div className="text-[10px] text-slate-400">Tanaka Kenji (Free Tier)</div>
+              <div className="font-bold text-slate-900 group-hover:text-rose-600 text-[11px] truncate">Student Profile</div>
+              <div className="text-[10px] text-slate-400 truncate">Tanaka Kenji (Free)</div>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleQuickAccount('teacher')}
+              className="px-2.5 py-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-left text-xs transition shadow-2xs group"
+            >
+              <div className="font-bold text-slate-900 group-hover:text-amber-600 text-[11px] truncate">Teacher (Sensei)</div>
+              <div className="text-[10px] text-slate-400 truncate">Yamamoto Sensei</div>
             </button>
             <button
               type="button"
               onClick={() => handleQuickAccount('admin')}
-              className="px-3 py-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-left text-xs transition shadow-2xs group"
+              className="px-2.5 py-2 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl text-left text-xs transition shadow-2xs group"
             >
-              <div className="font-bold text-slate-900 group-hover:text-indigo-600">Admin Master</div>
-              <div className="text-[10px] text-slate-400">Master Question Editor</div>
+              <div className="font-bold text-slate-900 group-hover:text-indigo-600 text-[11px] truncate">Admin Master</div>
+              <div className="text-[10px] text-slate-400 truncate">Super Admin 001</div>
             </button>
           </div>
         </div>
@@ -82,7 +105,10 @@ export const AuthModal: React.FC = () => {
         <div className="flex rounded-xl bg-slate-100 p-1">
           <button
             type="button"
-            onClick={() => setTab('signin')}
+            onClick={() => {
+              setTab('signin');
+              setPasskeyError(null);
+            }}
             className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition ${
               tab === 'signin' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
             }`}
@@ -91,7 +117,10 @@ export const AuthModal: React.FC = () => {
           </button>
           <button
             type="button"
-            onClick={() => setTab('register')}
+            onClick={() => {
+              setTab('register');
+              setPasskeyError(null);
+            }}
             className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition ${
               tab === 'register' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
             }`}
@@ -103,17 +132,71 @@ export const AuthModal: React.FC = () => {
         {/* Auth Form */}
         <form onSubmit={handleSubmit} className="space-y-3">
           {tab === 'register' && (
-            <div>
-              <label className="block text-[11px] font-bold text-slate-700 mb-1">Full Name (Japanese or English)</label>
-              <input
-                type="text"
-                required
-                value={fullName}
-                onChange={e => setFullName(e.target.value)}
-                placeholder="Tanaka Kenji"
-                className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 focus:outline-rose-500 transition"
-              />
-            </div>
+            <>
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                  Account Type / Role
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedRole('student')}
+                    className={`py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition ${
+                      selectedRole === 'student'
+                        ? 'border-rose-500 bg-rose-50 text-rose-700 shadow-xs'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    <span>Student / Learner</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedRole('teacher')}
+                    className={`py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition ${
+                      selectedRole === 'teacher'
+                        ? 'border-amber-500 bg-amber-50 text-amber-800 shadow-xs'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    <GraduationCap className="w-3.5 h-3.5" />
+                    <span>Teacher / Sensei</span>
+                  </button>
+                </div>
+              </div>
+
+              {selectedRole === 'teacher' && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-2.5 space-y-1">
+                  <label className="block text-[10px] font-bold text-amber-900">
+                    Educator Access Passkey (Demo: SENSEI2025)
+                  </label>
+                  <input
+                    type="text"
+                    value={teacherPasskey}
+                    onChange={e => {
+                      setTeacherPasskey(e.target.value);
+                      setPasskeyError(null);
+                    }}
+                    placeholder="SENSEI2025"
+                    className="w-full px-3 py-1.5 text-xs rounded-lg border border-amber-300 bg-white focus:outline-amber-600"
+                  />
+                  {passkeyError && (
+                    <p className="text-[10px] text-red-600 font-bold">{passkeyError}</p>
+                  )}
+                </div>
+              )}
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">Full Name (Japanese or English)</label>
+                <input
+                  type="text"
+                  required
+                  value={fullName}
+                  onChange={e => setFullName(e.target.value)}
+                  placeholder="Tanaka Kenji"
+                  className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-300 focus:outline-rose-500 transition"
+                />
+              </div>
+            </>
           )}
 
           <div>
@@ -144,7 +227,7 @@ export const AuthModal: React.FC = () => {
             type="submit"
             className="w-full py-2.5 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 active:scale-95 text-white rounded-xl text-xs font-bold shadow-md shadow-rose-600/30 transition flex items-center justify-center gap-1.5"
           >
-            <span>{tab === 'signin' ? 'Sign In to Portal' : 'Create Free Account'}</span>
+            <span>{tab === 'signin' ? 'Sign In to Portal' : 'Create Account'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </form>
