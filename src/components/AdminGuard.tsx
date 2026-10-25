@@ -62,17 +62,6 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({
     }, 400);
   };
 
-  const fillCredentials = (roleType: 'admin' | 'teacher') => {
-    if (roleType === 'admin') {
-      setUsername('admin@daiichi.com');
-      setPassword('admin123');
-    } else {
-      setUsername('teacher@daiichi.com');
-      setPassword('teacher123');
-    }
-    setErrorMessage(null);
-  };
-
   return (
     <div
       className="min-h-screen text-slate-100 flex items-center justify-center p-4 sm:p-6 font-sans relative"
@@ -187,36 +176,6 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({
             )}
           </button>
         </form>
-
-        {/* Credentials Assistant for Instant Testing */}
-        <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-white/10 space-y-2">
-          <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-            <span>Pre-Configured Staff Credentials</span>
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 text-[10px]">
-            <button
-              type="button"
-              onClick={() => fillCredentials('admin')}
-              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition group"
-            >
-              <div className="font-bold text-indigo-300 group-hover:text-indigo-200">Super Admin</div>
-              <div className="text-slate-400 font-mono text-[9px]">admin@daiichi.com</div>
-              <div className="text-slate-500 text-[9px]">Pass: admin123</div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => fillCredentials('teacher')}
-              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition group"
-            >
-              <div className="font-bold text-amber-300 group-hover:text-amber-200">Teacher / Sensei</div>
-              <div className="text-slate-400 font-mono text-[9px]">teacher@daiichi.com</div>
-              <div className="text-slate-500 text-[9px]">Pass: teacher123</div>
-            </button>
-          </div>
-        </div>
 
         {/* Navigation Actions */}
         <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-xs">

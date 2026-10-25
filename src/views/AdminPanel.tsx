@@ -52,6 +52,7 @@ import {
   getStoredFiles
 } from '../lib/storageService';
 import { getDatabaseStatus } from '../lib/dbService';
+import { compressImageFile } from '../lib/imageUtils';
 
 export const AdminPanel: React.FC = () => {
   const {
@@ -1402,19 +1403,17 @@ export const AdminPanel: React.FC = () => {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={e => {
+                  onChange={async e => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      const reader = new FileReader();
-                      reader.onload = ev => {
-                        const dataUrl = ev.target?.result as string;
-                        if (dataUrl) {
-                          updateThemeConfig({ customLogoUrl: dataUrl });
-                          setThemeToast(`✓ Custom logo "${file.name}" uploaded and applied!`);
-                          setTimeout(() => setThemeToast(null), 3000);
-                        }
-                      };
-                      reader.readAsDataURL(file);
+                      try {
+                        const compressedUrl = await compressImageFile(file, 400, 400, 0.9);
+                        updateThemeConfig({ customLogoUrl: compressedUrl });
+                        setThemeToast(`✓ Custom logo "${file.name}" uploaded and applied!`);
+                        setTimeout(() => setThemeToast(null), 3000);
+                      } catch (err: any) {
+                        setThemeToast(`Error uploading logo: ${err.message}`);
+                      }
                     }
                   }}
                   className="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-rose-600 file:text-white hover:file:bg-rose-500 cursor-pointer p-1 rounded-xl bg-slate-950/70 border border-white/10"
@@ -1483,19 +1482,17 @@ export const AdminPanel: React.FC = () => {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={e => {
+                  onChange={async e => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      const reader = new FileReader();
-                      reader.onload = ev => {
-                        const dataUrl = ev.target?.result as string;
-                        if (dataUrl) {
-                          updateThemeConfig({ backgroundImageUrl: dataUrl });
-                          setThemeToast(`✓ Custom background "${file.name}" applied!`);
-                          setTimeout(() => setThemeToast(null), 3000);
-                        }
-                      };
-                      reader.readAsDataURL(file);
+                      try {
+                        const compressedBg = await compressImageFile(file, 1920, 1080, 0.85);
+                        updateThemeConfig({ backgroundImageUrl: compressedBg });
+                        setThemeToast(`✓ Custom background "${file.name}" applied across platform!`);
+                        setTimeout(() => setThemeToast(null), 3000);
+                      } catch (err: any) {
+                        setThemeToast(`Error applying background: ${err.message}`);
+                      }
                     }
                   }}
                   className="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-600 file:text-white hover:file:bg-amber-500 cursor-pointer p-1 rounded-xl bg-slate-950/70 border border-white/10"

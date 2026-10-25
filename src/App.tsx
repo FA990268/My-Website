@@ -70,13 +70,13 @@ export function App() {
         {currentView === 'blog' && <BlogPage />}
         {currentView === 'admin' && (
           <AdminGuard allowedRoles={['admin', 'teacher']}>
-            <div className="min-h-screen w-full bg-[#090c15]">
+            <div className="min-h-screen w-full bg-slate-950/40 backdrop-blur-md">
               <AdminPanel />
             </div>
           </AdminGuard>
         )}
         {currentView === 'dashboard' && (
-          <div className="min-h-screen bg-slate-50 p-4 md:p-8">
+          <div className="min-h-screen p-4 md:p-8">
             <div className="max-w-5xl mx-auto">
               <StudentDashboard />
             </div>

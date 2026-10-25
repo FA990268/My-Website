@@ -79,3 +79,105 @@
     print-color-adjust: exact !important;
   }
 }
+
+/* =========================================================================
+   GLASSMORPHIC TRANSPARENCY SYSTEM
+   Applies custom background wallpaper and transparent frosted glass across all sections,
+   cards, panels, pop-ups, modals, and buttons.
+   ========================================================================= */
+
+:root {
+  --glass-opacity-val: 0.65;
+  --glass-blur-val: 16px;
+  --custom-bg-image: url('https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=2000&q=80');
+}
+
+body.theme-glass-active {
+  background-image: var(--custom-bg-image) !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-attachment: fixed !important;
+  background-repeat: no-repeat !important;
+  min-height: 100vh !important;
+}
+
+/* Translucent surfaces across all elements when glass theme is active */
+body.theme-glass-active .bg-white {
+  background-color: rgba(255, 255, 255, var(--glass-opacity-val, 0.65)) !important;
+  backdrop-filter: blur(var(--glass-blur-val, 16px)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-val, 16px)) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+body.theme-glass-active .bg-slate-50 {
+  background-color: rgba(248, 250, 252, calc(var(--glass-opacity-val, 0.65) * 0.9)) !important;
+  backdrop-filter: blur(var(--glass-blur-val, 16px)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-val, 16px)) !important;
+}
+
+body.theme-glass-active .bg-slate-100 {
+  background-color: rgba(241, 245, 249, calc(var(--glass-opacity-val, 0.65) * 0.85)) !important;
+  backdrop-filter: blur(var(--glass-blur-val, 16px)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-val, 16px)) !important;
+}
+
+body.theme-glass-active .bg-slate-800 {
+  background-color: rgba(30, 41, 59, calc(var(--glass-opacity-val, 0.75) * 1.05)) !important;
+  backdrop-filter: blur(var(--glass-blur-val, 18px)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-val, 18px)) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+body.theme-glass-active .bg-slate-900 {
+  background-color: rgba(15, 23, 42, calc(var(--glass-opacity-val, 0.75) * 1.05)) !important;
+  backdrop-filter: blur(var(--glass-blur-val, 18px)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-val, 18px)) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+body.theme-glass-active .bg-slate-950 {
+  background-color: rgba(2, 6, 23, calc(var(--glass-opacity-val, 0.8) * 1.05)) !important;
+  backdrop-filter: blur(var(--glass-blur-val, 18px)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-val, 18px)) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+body.theme-glass-active .bg-\[\#090c15\],
+body.theme-glass-active .bg-\[\#0c0f17\],
+body.theme-glass-active .bg-\[\#0b0e17\],
+body.theme-glass-active .bg-\[\#101420\] {
+  background-color: rgba(11, 15, 25, calc(var(--glass-opacity-val, 0.75) * 1.05)) !important;
+  backdrop-filter: blur(var(--glass-blur-val, 18px)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur-val, 18px)) !important;
+}
+
+/* Glass Popups, Dialogs and Modals */
+body.theme-glass-active .fixed.inset-0.z-50 > div {
+  background-color: rgba(15, 23, 42, 0.85) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Glass Buttons */
+body.theme-glass-active button {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Glass Header and Footer */
+body.theme-glass-active header {
+  background-color: rgba(255, 255, 255, calc(var(--glass-opacity-val, 0.65) * 0.85)) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+body.theme-glass-active footer {
+  background-color: rgba(15, 23, 42, calc(var(--glass-opacity-val, 0.75) * 1.1)) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}

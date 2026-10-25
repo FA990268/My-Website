@@ -258,9 +258,29 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   }, [activeAttempt]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.THEME_CONFIG, JSON.stringify(themeConfig));
-    document.documentElement.style.setProperty('--glass-opacity', `${themeConfig.glassOpacity / 100}`);
-    document.documentElement.style.setProperty('--glass-blur', `${themeConfig.glassBlur}px`);
+    try {
+      localStorage.setItem(STORAGE_KEYS.THEME_CONFIG, JSON.stringify(themeConfig));
+    } catch (e) {
+      console.warn('Theme storage warning (quota):', e);
+    }
+
+    // Apply live CSS variables to document root
+    const opacityVal = (themeConfig.glassOpacity || 65) / 100;
+    const blurVal = `${themeConfig.glassBlur ?? 16}px`;
+
+    document.documentElement.style.setProperty('--glass-opacity-val', `${opacityVal}`);
+    document.documentElement.style.setProperty('--glass-blur-val', blurVal);
+
+    if (themeConfig.backgroundImageUrl) {
+      document.documentElement.style.setProperty('--custom-bg-image', `url("${themeConfig.backgroundImageUrl}")`);
+    }
+
+    // Toggle global glass theme class on body
+    if (themeConfig.isGlassEnabled) {
+      document.body.classList.add('theme-glass-active');
+    } else {
+      document.body.classList.remove('theme-glass-active');
+    }
   }, [themeConfig]);
 
   // Admin User/Password Authentication Methods
@@ -268,10 +288,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const cleanUser = username.trim().toLowerCase();
     const cleanPass = password.trim();
 
-    // Super Admin: admin@daiichi.com / admin123 (also accepts admin / daiichi2025)
+    // Super Admin: admin@daiichi.com / DaiIchi#Admin2026 (also accepts admin123 / daiichi2025)
     if (
       (cleanUser === 'admin@daiichi.com' || cleanUser === 'admin' || cleanUser === 'daiichi') &&
-      (cleanPass === 'admin123' || cleanPass === 'daiichi2025')
+      (cleanPass === 'DaiIchi#Admin2026' || cleanPass === 'admin123' || cleanPass === 'daiichi2025')
     ) {
       setIsAdminAuthenticated(true);
       sessionStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, 'true');
@@ -280,10 +300,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       return { success: true };
     }
 
-    // Teacher / Sensei: teacher@daiichi.com / teacher123 (also accepts sensei / sensei2025)
+    // Teacher / Sensei: teacher@daiichi.com / DaiIchi#Sensei2026 (also accepts teacher123 / sensei2025)
     if (
       (cleanUser === 'teacher@daiichi.com' || cleanUser === 'sensei' || cleanUser === 'teacher') &&
-      (cleanPass === 'teacher123' || cleanPass === 'sensei2025')
+      (cleanPass === 'DaiIchi#Sensei2026' || cleanPass === 'teacher123' || cleanPass === 'sensei2025')
     ) {
       setIsAdminAuthenticated(true);
       sessionStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, 'true');
