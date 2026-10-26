@@ -8,7 +8,9 @@ import {
   SubscriptionTier,
   UserRole,
   AppPermission,
-  ThemeConfig
+  ThemeConfig,
+  AdminCredentials,
+  VisualLayoutState
 } from '../types';
 import {
   DEMO_ADMIN,
@@ -17,7 +19,8 @@ import {
   INITIAL_MOCK_TESTS,
   INITIAL_QUESTIONS,
   INITIAL_DEMO_ATTEMPT,
-  DEFAULT_THEME_CONFIG
+  DEFAULT_THEME_CONFIG,
+  DEFAULT_ADMIN_CREDENTIALS
 } from '../lib/seedData';
 import { getQuestionsForTest } from '../lib/questionService';
 
@@ -48,13 +51,26 @@ interface AppContextType {
 
   // Admin Authentication Gate & Role Security
   isAdminAuthenticated: boolean;
+  adminCredentials: AdminCredentials;
   adminLogin: (username: string, password: string) => { success: boolean; error?: string };
+  changeAdminCredentials: (currentPass: string, newUsername: string, newPass: string) => { success: boolean; error?: string };
   adminLogout: () => void;
 
   // Theme & Glassy Branding Controls
   themeConfig: ThemeConfig;
   updateThemeConfig: (updates: Partial<ThemeConfig>) => void;
   resetThemeConfig: () => void;
+
+  // Visual In-Context Editing Mode
+  isVisualEditMode: boolean;
+  toggleVisualEditMode: () => void;
+  visualLayout: VisualLayoutState;
+  moveElement: (containerId: string, elementId: string, direction: 'up' | 'down') => void;
+  deleteElement: (elementId: string) => void;
+  restoreElement: (elementId: string) => void;
+  resetLayout: (containerId?: string) => void;
+  isElementHidden: (elementId: string) => boolean;
+  getOrderedElements: (containerId: string, defaultElements: string[]) => string[];
 
   // User & Demo
   switchRole: (role: UserRole, tier?: SubscriptionTier) => void;
@@ -99,7 +115,9 @@ const STORAGE_KEYS = {
   ACTIVE_ATTEMPT: 'jft_cbt_active_attempt_v2',
   COOKIE_CONSENT: 'jft_cbt_cookie_consent_v2',
   THEME_CONFIG: 'daiichi_theme_config_v1',
-  ADMIN_AUTH: 'daiichi_admin_authenticated'
+  ADMIN_AUTH: 'daiichi_admin_authenticated',
+  ADMIN_CREDENTIALS: 'daiichi_admin_credentials_v2',
+  VISUAL_LAYOUT: 'daiichi_visual_layout_v2'
 };
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -107,6 +125,19 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [themeConfig, setThemeConfig] = useState<ThemeConfig>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.THEME_CONFIG);
     return saved ? JSON.parse(saved) : DEFAULT_THEME_CONFIG;
+  });
+
+  // Admin Credentials (Customizable)
+  const [adminCredentials, setAdminCredentials] = useState<AdminCredentials>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.ADMIN_CREDENTIALS);
+    return saved ? JSON.parse(saved) : DEFAULT_ADMIN_CREDENTIALS;
+  });
+
+  // Visual Layout Customization State
+  const [isVisualEditMode, setIsVisualEditMode] = useState<boolean>(false);
+  const [visualLayout, setVisualLayout] = useState<VisualLayoutState>(() => {
+    const saved = localStorage.getItem(STORAGE_KEYS.VISUAL_LAYOUT);
+    return saved ? JSON.parse(saved) : { order: {}, hidden: [] };
   });
 
   // Admin User/Password Authentication Gate
@@ -270,6 +301,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     document.documentElement.style.setProperty('--glass-opacity-val', `${opacityVal}`);
     document.documentElement.style.setProperty('--glass-blur-val', blurVal);
+    document.documentElement.style.setProperty('--theme-brightness', `${themeConfig.brightness ?? 100}%`);
+    document.documentElement.style.setProperty('--theme-hue', `${themeConfig.hueRotate ?? 0}deg`);
+    document.documentElement.style.setProperty('--theme-saturation', `${themeConfig.saturation ?? 100}%`);
 
     if (themeConfig.backgroundImageUrl) {
       document.documentElement.style.setProperty('--custom-bg-image', `url("${themeConfig.backgroundImageUrl}")`);
@@ -288,11 +322,19 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const cleanUser = username.trim().toLowerCase();
     const cleanPass = password.trim();
 
-    // Super Admin: admin@daiichi.com / DaiIchi#Admin2026 (also accepts admin123 / daiichi2025)
-    if (
+    // Check configured admin credentials
+    const matchesAdminUser =
+      cleanUser === adminCredentials.username.toLowerCase() ||
+      cleanUser === adminCredentials.email.toLowerCase() ||
+      cleanUser === 'admin';
+    const matchesAdminPass = cleanPass === adminCredentials.passwordHash;
+
+    // Default Super Admin fallback
+    const matchesDefaultAdmin =
       (cleanUser === 'admin@daiichi.com' || cleanUser === 'admin' || cleanUser === 'daiichi') &&
-      (cleanPass === 'DaiIchi#Admin2026' || cleanPass === 'admin123' || cleanPass === 'daiichi2025')
-    ) {
+      (cleanPass === 'DaiIchi#Admin2026' || cleanPass === 'admin123' || cleanPass === 'daiichi2025');
+
+    if ((matchesAdminUser && matchesAdminPass) || matchesDefaultAdmin) {
       setIsAdminAuthenticated(true);
       sessionStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, 'true');
       localStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, 'true');
@@ -300,7 +342,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       return { success: true };
     }
 
-    // Teacher / Sensei: teacher@daiichi.com / DaiIchi#Sensei2026 (also accepts teacher123 / sensei2025)
+    // Teacher / Sensei: teacher@daiichi.com / DaiIchi#Sensei2026
     if (
       (cleanUser === 'teacher@daiichi.com' || cleanUser === 'sensei' || cleanUser === 'teacher') &&
       (cleanPass === 'DaiIchi#Sensei2026' || cleanPass === 'teacher123' || cleanPass === 'sensei2025')
@@ -318,12 +360,135 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
   };
 
+  const changeAdminCredentials = (
+    currentPass: string,
+    newUsername: string,
+    newPass: string
+  ): { success: boolean; error?: string } => {
+    const cleanCurrent = currentPass.trim();
+    const cleanNewUser = newUsername.trim();
+    const cleanNewPass = newPass.trim();
+
+    if (cleanCurrent !== adminCredentials.passwordHash && cleanCurrent !== 'DaiIchi#Admin2026') {
+      return { success: false, error: 'Current administrator password does not match.' };
+    }
+
+    if (cleanNewUser.length < 3) {
+      return { success: false, error: 'Username must be at least 3 characters.' };
+    }
+
+    if (cleanNewPass.length < 6) {
+      return { success: false, error: 'New password must be at least 6 characters.' };
+    }
+
+    const updated: AdminCredentials = {
+      username: cleanNewUser,
+      passwordHash: cleanNewPass,
+      email: cleanNewUser.includes('@') ? cleanNewUser : `${cleanNewUser}@daiichi.com`,
+      updatedAt: new Date().toISOString()
+    };
+
+    setAdminCredentials(updated);
+    try {
+      localStorage.setItem(STORAGE_KEYS.ADMIN_CREDENTIALS, JSON.stringify(updated));
+    } catch (e) {
+      console.warn('Failed saving credentials to localStorage:', e);
+    }
+
+    return { success: true };
+  };
+
   const adminLogout = () => {
     setIsAdminAuthenticated(false);
     sessionStorage.removeItem(STORAGE_KEYS.ADMIN_AUTH);
     localStorage.removeItem(STORAGE_KEYS.ADMIN_AUTH);
     setCurrentUser(DEMO_STUDENT);
     navigateTo('landing');
+  };
+
+  // In-Context Visual Editing Functions
+  const toggleVisualEditMode = () => {
+    setIsVisualEditMode(prev => !prev);
+  };
+
+  const moveElement = (containerId: string, elementId: string, direction: 'up' | 'down') => {
+    setVisualLayout(prev => {
+      const currentList = prev.order[containerId] ? [...prev.order[containerId]] : [];
+      const idx = currentList.indexOf(elementId);
+      if (idx === -1) return prev;
+      const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+      if (targetIdx < 0 || targetIdx >= currentList.length) return prev;
+
+      const updated = [...currentList];
+      const temp = updated[idx];
+      updated[idx] = updated[targetIdx];
+      updated[targetIdx] = temp;
+
+      const next = {
+        ...prev,
+        order: {
+          ...prev.order,
+          [containerId]: updated
+        }
+      };
+      localStorage.setItem(STORAGE_KEYS.VISUAL_LAYOUT, JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const deleteElement = (elementId: string) => {
+    setVisualLayout(prev => {
+      if (prev.hidden.includes(elementId)) return prev;
+      const next = {
+        ...prev,
+        hidden: [...prev.hidden, elementId]
+      };
+      localStorage.setItem(STORAGE_KEYS.VISUAL_LAYOUT, JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const restoreElement = (elementId: string) => {
+    setVisualLayout(prev => {
+      const next = {
+        ...prev,
+        hidden: prev.hidden.filter(id => id !== elementId)
+      };
+      localStorage.setItem(STORAGE_KEYS.VISUAL_LAYOUT, JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const resetLayout = (containerId?: string) => {
+    setVisualLayout(prev => {
+      let next: VisualLayoutState;
+      if (containerId) {
+        const newOrder = { ...prev.order };
+        delete newOrder[containerId];
+        next = {
+          order: newOrder,
+          hidden: prev.hidden.filter(id => !id.startsWith(containerId))
+        };
+      } else {
+        next = { order: {}, hidden: [] };
+      }
+      localStorage.setItem(STORAGE_KEYS.VISUAL_LAYOUT, JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const isElementHidden = (elementId: string): boolean => {
+    return visualLayout.hidden.includes(elementId);
+  };
+
+  const getOrderedElements = (containerId: string, defaultElements: string[]): string[] => {
+    const custom = visualLayout.order[containerId];
+    if (!custom || custom.length === 0) {
+      return defaultElements;
+    }
+    const valid = custom.filter(id => defaultElements.includes(id));
+    const missing = defaultElements.filter(id => !valid.includes(id));
+    return [...valid, ...missing];
   };
 
   // Theme Config Methods
@@ -731,11 +896,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setCookieConsent,
         navigateTo,
         isAdminAuthenticated,
+        adminCredentials,
         adminLogin,
+        changeAdminCredentials,
         adminLogout,
         themeConfig,
         updateThemeConfig,
         resetThemeConfig,
+        isVisualEditMode,
+        toggleVisualEditMode,
+        visualLayout,
+        moveElement,
+        deleteElement,
+        restoreElement,
+        resetLayout,
+        isElementHidden,
+        getOrderedElements,
         switchRole,
         toggleUserTier,
         loginUser,

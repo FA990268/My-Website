@@ -114,7 +114,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({
         <form onSubmit={handleAuthSubmit} className="space-y-4">
           <div>
             <label className="block text-[11px] font-bold text-slate-300 mb-1">
-              Administrator Username or Staff Email
+              Authorized Staff Username or Email
             </label>
             <div className="relative">
               <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -123,7 +123,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({
                 required
                 value={username}
                 onChange={e => setUsername(e.target.value)}
-                placeholder="admin@daiichi.com"
+                placeholder="Enter administrator username"
                 className="w-full pl-9 pr-3.5 py-2.5 text-xs rounded-xl bg-slate-950/70 border border-white/20 text-white placeholder-slate-500 focus:outline-rose-500 transition"
               />
             </div>
@@ -131,7 +131,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({
 
           <div>
             <label className="block text-[11px] font-bold text-slate-300 mb-1">
-              Admin Password
+              Secret Password
             </label>
             <div className="relative">
               <KeyRound className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -140,7 +140,7 @@ export const AdminGuard: React.FC<AdminGuardProps> = ({
                 required
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="Enter password"
                 className="w-full pl-9 pr-10 py-2.5 text-xs rounded-xl bg-slate-950/70 border border-white/20 text-white placeholder-slate-500 focus:outline-rose-500 transition"
               />
               <button

@@ -89,6 +89,9 @@
 :root {
   --glass-opacity-val: 0.65;
   --glass-blur-val: 16px;
+  --theme-brightness: 100%;
+  --theme-hue: 0deg;
+  --theme-saturation: 100%;
   --custom-bg-image: url('https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=2000&q=80');
 }
 
@@ -99,6 +102,54 @@ body.theme-glass-active {
   background-attachment: fixed !important;
   background-repeat: no-repeat !important;
   min-height: 100vh !important;
+}
+
+#root {
+  filter: brightness(var(--theme-brightness, 100%)) hue-rotate(var(--theme-hue, 0deg)) saturate(var(--theme-saturation, 100%));
+  transition: filter 0.15s ease-out;
+  min-height: 100vh;
+}
+
+/* Transparent Capsule Styling */
+.capsule-glass {
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(var(--glass-blur-val, 16px));
+  -webkit-backdrop-filter: blur(var(--glass-blur-val, 16px));
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 9999px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+}
+
+.capsule-glass-dark {
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(var(--glass-blur-val, 18px));
+  -webkit-backdrop-filter: blur(var(--glass-blur-val, 18px));
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 9999px;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
+}
+
+.toast-capsule {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 9999px;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+}
+
+/* In-context visual editor highlights */
+.visual-edit-highlight {
+  position: relative;
+  outline: 2px dashed rgba(245, 158, 11, 0.6);
+  outline-offset: 4px;
+  border-radius: 1.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.visual-edit-highlight:hover {
+  outline: 2px solid rgba(245, 158, 11, 1);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
 }
 
 /* Translucent surfaces across all elements when glass theme is active */

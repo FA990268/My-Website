@@ -8,6 +8,7 @@ import { PricingModal } from './components/PricingModal';
 import { VideoDemoModal } from './components/VideoDemoModal';
 import { DemoToolbar } from './components/DemoToolbar';
 import { AdminGuard } from './components/AdminGuard';
+import { VisualEditorToolbar } from './components/VisualEditorToolbar';
 
 // Views
 import { LandingPage } from './views/LandingPage';
@@ -89,6 +90,9 @@ export function App() {
 
       {/* Persistent Cookie Banner */}
       <CookieBanner />
+
+      {/* In-Context Visual Layout Editor Toolbar for Staff */}
+      <VisualEditorToolbar />
 
       {/* Global Modals */}
       <AuthModal />

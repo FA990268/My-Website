@@ -28,9 +28,25 @@ export interface ThemeConfig {
   instituteSlogan: string; // 'Japanese Language and Visa Consultancy'
   isGlassEnabled: boolean;
   glassOpacity: number; // 20 to 100 (%)
-  glassBlur: number; // 0 to 30 (px)
+  glassBlur: number; // 0 to 40 (px)
   glassBorder: boolean;
   fullTransparency: boolean;
+  brightness: number; // 50 to 150 (%)
+  colorTone: 'indigo' | 'crimson' | 'sapphire' | 'emerald' | 'amber' | 'obsidian';
+  hueRotate: number; // 0 to 360 (deg)
+  saturation: number; // 50 to 150 (%)
+}
+
+export interface AdminCredentials {
+  username: string;
+  passwordHash: string;
+  email: string;
+  updatedAt: string;
+}
+
+export interface VisualLayoutState {
+  order: Record<string, string[]>; // containerId -> elementIds[]
+  hidden: string[]; // elementIds[]
 }
 
 export interface CloudFileItem {

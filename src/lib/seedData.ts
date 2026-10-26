@@ -1,4 +1,4 @@
-import { MockTest, Question, UserProfile, ExamAttempt, ThemeConfig } from '../types';
+import { MockTest, Question, UserProfile, ExamAttempt, ThemeConfig, AdminCredentials } from '../types';
 import { ALL_MOCK_TESTS } from './mockTestsData';
 
 export const DEFAULT_THEME_CONFIG: ThemeConfig = {
@@ -11,7 +11,18 @@ export const DEFAULT_THEME_CONFIG: ThemeConfig = {
   glassOpacity: 70,
   glassBlur: 16,
   glassBorder: true,
-  fullTransparency: true
+  fullTransparency: true,
+  brightness: 100,
+  colorTone: 'crimson',
+  hueRotate: 0,
+  saturation: 100
+};
+
+export const DEFAULT_ADMIN_CREDENTIALS: AdminCredentials = {
+  username: 'admin@daiichi.com',
+  passwordHash: 'DaiIchi#Admin2026',
+  email: 'admin@daiichi.com',
+  updatedAt: new Date().toISOString()
 };
 
 export const DEMO_ADMIN: UserProfile = {

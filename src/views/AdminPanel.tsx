@@ -41,7 +41,12 @@ import {
   Palette,
   Sliders,
   RefreshCw,
-  LogOut
+  LogOut,
+  Sun,
+  KeyRound,
+  ShieldCheck,
+  Layers,
+  Move
 } from 'lucide-react';
 import { AdminSplitScreenEditor } from '../components/AdminSplitScreenEditor';
 import { AdminSetupPanel } from '../components/AdminSetupPanel';
@@ -73,16 +78,58 @@ export const AdminPanel: React.FC = () => {
     themeConfig,
     updateThemeConfig,
     resetThemeConfig,
-    adminLogout
+    adminLogout,
+    adminCredentials,
+    changeAdminCredentials,
+    isVisualEditMode,
+    toggleVisualEditMode,
+    resetLayout
   } = useApp();
 
-  const [activeAdminTab, setActiveAdminTab] = useState<'setup' | 'overview' | 'split-screen' | 'tests' | 'questions' | 'users' | 'storage' | 'theme' | 'import'>('setup');
+  const [activeAdminTab, setActiveAdminTab] = useState<'setup' | 'overview' | 'split-screen' | 'tests' | 'questions' | 'users' | 'storage' | 'theme' | 'security' | 'import'>('setup');
   const [selectedTestId, setSelectedTestId] = useState<string>(mockTests[0]?.id || 'test_jft_01');
   const [selectedSectionNumber, setSelectedSectionNumber] = useState<1 | 2 | 3 | 4>(1);
   const [userSearchTerm, setUserSearchTerm] = useState<string>('');
 
   // Logo & Theme Upload Status
   const [themeToast, setThemeToast] = useState<string | null>(null);
+
+  // Administrator Credential Management State
+  const [currentAdminPass, setCurrentAdminPass] = useState('');
+  const [newAdminUser, setNewAdminUser] = useState('');
+  const [newAdminPass, setNewAdminPass] = useState('');
+  const [confirmAdminPass, setConfirmAdminPass] = useState('');
+  const [credStatusMessage, setCredStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  const handleChangeCredentials = (e: React.FormEvent) => {
+    e.preventDefault();
+    setCredStatusMessage(null);
+
+    if (newAdminPass !== confirmAdminPass) {
+      setCredStatusMessage({
+        type: 'error',
+        text: 'New password and confirmation password do not match.'
+      });
+      return;
+    }
+
+    const res = changeAdminCredentials(currentAdminPass, newAdminUser, newAdminPass);
+    if (res.success) {
+      setCredStatusMessage({
+        type: 'success',
+        text: 'Administrator credentials updated and persisted successfully! Please use these credentials next time you sign in.'
+      });
+      setCurrentAdminPass('');
+      setNewAdminUser('');
+      setNewAdminPass('');
+      setConfirmAdminPass('');
+    } else {
+      setCredStatusMessage({
+        type: 'error',
+        text: res.error || 'Failed to update credentials.'
+      });
+    }
+  };
 
   // Cloud Storage & Database State
   const [storageBucketSelect, setStorageBucketSelect] = useState<StorageBucket>('exam-pdfs');
@@ -287,6 +334,15 @@ export const AdminPanel: React.FC = () => {
           <Palette className="w-3.5 h-3.5 text-amber-400" />
           <span>Theme & Glass Control</span>
           <span className="bg-amber-400 text-slate-900 text-[9px] font-black px-1.5 py-0.2 rounded-full uppercase">NEW</span>
+        </button>
+        <button
+          onClick={() => setActiveAdminTab('security')}
+          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+            activeAdminTab === 'security' ? 'bg-rose-600 text-white shadow-md shadow-rose-500/30' : 'text-rose-300 hover:text-white bg-rose-950/40 border border-rose-500/30'
+          }`}
+        >
+          <KeyRound className="w-3.5 h-3.5 text-rose-400" />
+          <span>Security & Credentials</span>
         </button>
         <button
           onClick={() => setActiveAdminTab('overview')}
@@ -1597,7 +1653,7 @@ export const AdminPanel: React.FC = () => {
                   className="w-full accent-amber-500 cursor-pointer"
                 />
                 <p className="text-[10px] text-slate-400">
-                  Controls the translucent background alpha across containers.
+                  Controls translucent background alpha across containers and cards.
                 </p>
               </div>
 
@@ -1610,21 +1666,81 @@ export const AdminPanel: React.FC = () => {
                 <input
                   type="range"
                   min="0"
-                  max="30"
+                  max="40"
                   step="2"
                   value={themeConfig.glassBlur}
                   onChange={e => updateThemeConfig({ glassBlur: Number(e.target.value) })}
                   className="w-full accent-rose-500 cursor-pointer"
                 />
                 <p className="text-[10px] text-slate-400">
-                  Gaussian blur strength applied to content behind glass panels.
+                  Gaussian blur strength (0px - 40px) applied behind frosted panels.
+                </p>
+              </div>
+
+              {/* Brightness Slider */}
+              <div className="space-y-2 p-4 rounded-2xl bg-white/5 border border-white/10">
+                <div className="flex justify-between text-xs font-bold">
+                  <span>Display Brightness</span>
+                  <span className="text-amber-300 font-mono">{themeConfig.brightness || 100}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="50"
+                  max="150"
+                  step="5"
+                  value={themeConfig.brightness || 100}
+                  onChange={e => updateThemeConfig({ brightness: Number(e.target.value) })}
+                  className="w-full accent-amber-400 cursor-pointer"
+                />
+                <p className="text-[10px] text-slate-400">
+                  Overall interface luminance filter (50% to 150%).
+                </p>
+              </div>
+
+              {/* Hue Rotation / Color Tone Slider */}
+              <div className="space-y-2 p-4 rounded-2xl bg-white/5 border border-white/10">
+                <div className="flex justify-between text-xs font-bold">
+                  <span>Color Tone (Hue Shift)</span>
+                  <span className="text-indigo-400 font-mono">{themeConfig.hueRotate || 0}°</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="360"
+                  step="5"
+                  value={themeConfig.hueRotate || 0}
+                  onChange={e => updateThemeConfig({ hueRotate: Number(e.target.value) })}
+                  className="w-full accent-indigo-500 cursor-pointer"
+                />
+                <p className="text-[10px] text-slate-400">
+                  Rotates color palette across the entire application in real time.
+                </p>
+              </div>
+
+              {/* Color Saturation Slider */}
+              <div className="space-y-2 p-4 rounded-2xl bg-white/5 border border-white/10">
+                <div className="flex justify-between text-xs font-bold">
+                  <span>Saturation Intensity</span>
+                  <span className="text-emerald-400 font-mono">{themeConfig.saturation || 100}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="50"
+                  max="150"
+                  step="5"
+                  value={themeConfig.saturation || 100}
+                  onChange={e => updateThemeConfig({ saturation: Number(e.target.value) })}
+                  className="w-full accent-emerald-500 cursor-pointer"
+                />
+                <p className="text-[10px] text-slate-400">
+                  Adjust color vibrancy from soft pastel to high contrast.
                 </p>
               </div>
 
               {/* Full Transparency Across Elements Toggle */}
               <div className="space-y-2 p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col justify-between">
                 <div className="flex justify-between text-xs font-bold">
-                  <span>Full Transparency Across Elements</span>
+                  <span>Full Transparency Mode</span>
                   <span className={themeConfig.fullTransparency ? 'text-emerald-400' : 'text-slate-400'}>
                     {themeConfig.fullTransparency ? 'ENABLED' : 'OFF'}
                   </span>
@@ -1637,12 +1753,86 @@ export const AdminPanel: React.FC = () => {
                     className="rounded text-emerald-500"
                   />
                   <span className="text-xs text-slate-300 font-semibold">
-                    Apply glass transparency to all buttons, popups & modals
+                    Remove opaque base containers & enable floating capsules
                   </span>
                 </label>
                 <p className="text-[10px] text-slate-400">
-                  Removes opaque solid containers in favor of frosted glass panels.
+                  Transparent capsule navigation, pills, pop-ups, and modals.
                 </p>
+              </div>
+            </div>
+
+            {/* Quick Color Tone Presets */}
+            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+              <label className="block text-xs font-bold text-slate-200">
+                1-Click Japanese & Modern Color Tone Presets:
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-6 gap-2">
+                {[
+                  { name: 'Crimson Torii', hue: 0, sat: 105 },
+                  { name: 'Sapphire Blue', hue: 215, sat: 110 },
+                  { name: 'Emerald Sensei', hue: 145, sat: 100 },
+                  { name: 'Amber Gold', hue: 45, sat: 115 },
+                  { name: 'Royal Indigo', hue: 255, sat: 110 },
+                  { name: 'Neutral Slate', hue: 0, sat: 80 }
+                ].map(preset => (
+                  <button
+                    key={preset.name}
+                    type="button"
+                    onClick={() => {
+                      updateThemeConfig({ hueRotate: preset.hue, saturation: preset.sat });
+                      setThemeToast(`✓ Applied color tone "${preset.name}"!`);
+                      setTimeout(() => setThemeToast(null), 3000);
+                    }}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border transition text-center ${
+                      (themeConfig.hueRotate || 0) === preset.hue
+                        ? 'border-amber-400 bg-amber-500/20 text-amber-200'
+                        : 'border-white/10 bg-white/5 hover:bg-white/10 text-slate-300'
+                    }`}
+                  >
+                    {preset.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* In-Context Visual Layout Editor Card */}
+            <div className="p-5 rounded-3xl bg-amber-950/40 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-amber-400" />
+                  <h4 className="text-sm font-bold text-white">In-Context Visual Layout Editor</h4>
+                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                    Live Drag & Reorder
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300">
+                  Enables live visual controls (Move Up, Move Down, Delete/Hide) directly on elements across the platform.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                <button
+                  type="button"
+                  onClick={() => resetLayout()}
+                  className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-slate-200 border border-white/20 transition flex items-center gap-1.5"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Reset All Layouts</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={toggleVisualEditMode}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-lg ${
+                    isVisualEditMode
+                      ? 'bg-amber-500 text-slate-950 hover:bg-amber-400'
+                      : 'bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 text-white'
+                  }`}
+                >
+                  <Move className="w-3.5 h-3.5" />
+                  <span>{isVisualEditMode ? 'Visual Edit Mode: ACTIVE' : 'Enable Visual Edit Mode'}</span>
+                </button>
               </div>
             </div>
 
@@ -1695,6 +1885,193 @@ export const AdminPanel: React.FC = () => {
                     Modals, tooltips, and exam dialogs render with crystal clear blur and subtle borders.
                   </p>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          TAB: SECURITY & CREDENTIAL MANAGEMENT (Robust Auth & Credential Change)
+          ========================================================================= */}
+      {activeAdminTab === 'security' && (
+        <div className="space-y-6">
+          <div className="bg-gradient-to-r from-red-950/80 via-slate-900/90 to-rose-950/80 backdrop-blur-2xl border border-white/20 rounded-3xl p-6 sm:p-8 text-white shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                <ShieldCheck className="w-3.5 h-3.5 text-rose-400" />
+                <span>Administrator Authentication & Access Control Gate</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
+                Security & Credential Management
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
+                Manage administrator login credentials, change your password, view authentication audit logs, and enforce strict role-based access control.
+              </p>
+            </div>
+
+            <button
+              onClick={adminLogout}
+              className="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-xl text-xs font-bold text-white transition flex items-center gap-2 self-start md:self-auto shadow-lg shadow-red-600/30"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Sign Out & Lock Admin Panel</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Left Column: Change Credentials Form */}
+            <div className="lg:col-span-7 bg-slate-900/80 backdrop-blur-2xl border border-white/20 rounded-3xl p-6 sm:p-8 text-white space-y-6 shadow-xl">
+              <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+                <div className="w-10 h-10 rounded-2xl bg-rose-500/20 border border-rose-500/30 flex items-center justify-center text-rose-400">
+                  <KeyRound className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-base text-white">Change Administrator Credentials</h3>
+                  <p className="text-xs text-slate-400">
+                    Update your staff username and secret password. Changes persist in local storage.
+                  </p>
+                </div>
+              </div>
+
+              {credStatusMessage && (
+                <div
+                  className={`p-4 rounded-2xl text-xs font-bold flex items-center gap-2.5 animate-in fade-in ${
+                    credStatusMessage.type === 'success'
+                      ? 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-200'
+                      : 'bg-rose-500/20 border border-rose-500/40 text-rose-200'
+                  }`}
+                >
+                  {credStatusMessage.type === 'success' ? (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  ) : (
+                    <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0" />
+                  )}
+                  <span>{credStatusMessage.text}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleChangeCredentials} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                    Current Password <span className="text-rose-400">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    value={currentAdminPass}
+                    onChange={e => setCurrentAdminPass(e.target.value)}
+                    placeholder="Enter current password to verify identity"
+                    className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-950/70 border border-white/20 text-white placeholder-slate-500 focus:outline-rose-500 transition"
+                  />
+                </div>
+
+                <div className="pt-2 border-t border-white/10 space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                      New Administrator Username or Staff Email <span className="text-rose-400">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newAdminUser}
+                      onChange={e => setNewAdminUser(e.target.value)}
+                      placeholder="e.g. admin or daiichi.admin@daiichi.com"
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-950/70 border border-white/20 text-white placeholder-slate-500 focus:outline-rose-500 transition"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                        New Password <span className="text-rose-400">*</span>
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        value={newAdminPass}
+                        onChange={e => setNewAdminPass(e.target.value)}
+                        placeholder="At least 6 characters"
+                        className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-950/70 border border-white/20 text-white placeholder-slate-500 focus:outline-rose-500 transition"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-300 mb-1.5">
+                        Confirm New Password <span className="text-rose-400">*</span>
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        value={confirmAdminPass}
+                        onChange={e => setConfirmAdminPass(e.target.value)}
+                        placeholder="Re-type new password"
+                        className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-950/70 border border-white/20 text-white placeholder-slate-500 focus:outline-rose-500 transition"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-3">
+                  <button
+                    type="submit"
+                    className="w-full py-3 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 active:scale-[0.98] text-white rounded-xl text-xs font-black shadow-lg shadow-rose-600/30 border border-white/20 transition flex items-center justify-center gap-2"
+                  >
+                    <KeyRound className="w-4 h-4" />
+                    <span>Save & Persist New Credentials</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* Right Column: Account Status & Access Audit */}
+            <div className="lg:col-span-5 space-y-6">
+              {/* Active Admin Identity Badge */}
+              <div className="bg-slate-900/80 backdrop-blur-2xl border border-white/20 rounded-3xl p-6 text-white space-y-4 shadow-xl">
+                <h4 className="font-extrabold text-sm text-white flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  <span>Active Session Information</span>
+                </h4>
+
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2.5 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Current Username:</span>
+                    <span className="font-mono text-emerald-300 font-bold">{adminCredentials.username}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Admin Email:</span>
+                    <span className="font-mono text-slate-200">{adminCredentials.email}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Access Level:</span>
+                    <span className="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30 text-[10px]">
+                      SUPER ADMIN (MASTER)
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Last Credential Update:</span>
+                    <span className="text-slate-300 text-[11px]">
+                      {new Date(adminCredentials.updatedAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+
+                <p className="text-[11px] text-slate-400">
+                  All administrative functions, model setups, split-screen PDF editing, student records, and cloud storage configurations are protected behind this credential gate.
+                </p>
+              </div>
+
+              {/* Security Policy Card */}
+              <div className="bg-slate-900/80 backdrop-blur-2xl border border-white/20 rounded-3xl p-6 text-white space-y-3 shadow-xl">
+                <h4 className="font-extrabold text-sm text-white flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-amber-400" />
+                  <span>Strict Security Policy</span>
+                </h4>
+                <ul className="text-xs text-slate-300 space-y-2 list-disc list-inside">
+                  <li>Default credentials have been stripped from all client login screens.</li>
+                  <li>Students attempting to access <code className="text-rose-300 bg-white/10 px-1 rounded">#/admin</code> will be intercepted by the password gate.</li>
+                  <li>Credentials updated here are stored securely in browser persistence.</li>
+                </ul>
               </div>
             </div>
           </div>
