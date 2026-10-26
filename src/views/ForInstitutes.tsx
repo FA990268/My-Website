@@ -71,19 +71,19 @@ export const ForInstitutes: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans py-8">
+    <div className="min-h-screen font-sans py-8 text-white relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Banner */}
-        <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="rounded-[2.25rem] glass-panel p-6 sm:p-8 text-white shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 border border-white/30 backdrop-blur-2xl">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/15 text-white border border-white/30 backdrop-blur">
               <Building2 className="w-3.5 h-3.5" />
               <span>B2B Portal for Japanese Language Academies & SSW Sending Organizations</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
               Institutional CBT Assessment & Cohort Management
             </h1>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            <p className="text-xs sm:text-sm text-white/85 leading-relaxed">
               Empower your academy teachers with real-time student pass predictions, bulk exam enrollment, batch weakness heatmaps, and official printable immigration progress reports.
             </p>
           </div>
@@ -91,7 +91,7 @@ export const ForInstitutes: React.FC = () => {
           <div className="flex gap-2">
             <button
               onClick={() => setShowEnrollModal(true)}
-              className="px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold shadow-md shadow-rose-600/30 transition flex items-center gap-1.5"
+              className="px-5 py-2.5 glass-btn-primary text-white rounded-full text-xs font-bold shadow-lg transition flex items-center gap-1.5"
             >
               <Plus className="w-4 h-4" />
               <span>Enroll Students</span>
@@ -102,10 +102,10 @@ export const ForInstitutes: React.FC = () => {
         {/* Cohort Selector Tabs */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-white/70">
               Select Academy Batch / Cohort:
             </span>
-            <span className="text-xs font-bold text-rose-600">3 Active Cohorts</span>
+            <span className="text-xs font-bold text-rose-300">3 Active Cohorts</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -115,20 +115,20 @@ export const ForInstitutes: React.FC = () => {
                 onClick={() => setSelectedCohortId(c.id)}
                 className={`p-5 rounded-2xl border text-left transition space-y-2 ${
                   selectedCohortId === c.id
-                    ? 'bg-white border-2 border-rose-500 shadow-md ring-2 ring-rose-100'
-                    : 'bg-white border-slate-200 hover:border-slate-300 shadow-xs'
+                    ? 'glass-capsule-item-active'
+                    : 'glass-capsule-item'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/70">
                     {c.track}
                   </span>
-                  <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
+                  <span className="text-xs font-black text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-400/30">
                     {c.passRate}% Pass Rate
                   </span>
                 </div>
-                <h3 className="text-sm font-extrabold text-slate-900">{c.name}</h3>
-                <div className="flex items-center justify-between text-xs text-slate-500 pt-1 border-t border-slate-100">
+                <h3 className="text-sm font-extrabold text-white">{c.name}</h3>
+                <div className="flex items-center justify-between text-xs text-white/70 pt-1 border-t border-white/15">
                   <span>{c.studentCount} Students</span>
                   <span>Avg: {c.avgScore}/250 pts</span>
                 </div>
@@ -139,44 +139,44 @@ export const ForInstitutes: React.FC = () => {
 
         {/* Cohort Overview Metrics */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 text-center shadow-xs">
-            <div className="text-2xl font-black text-slate-900">{activeCohort.studentCount}</div>
-            <div className="text-[11px] font-bold text-slate-400 uppercase mt-0.5">Enrolled Candidates</div>
+          <div className="glass-panel p-5 rounded-2xl text-center shadow-sm">
+            <div className="text-2xl font-black text-white">{activeCohort.studentCount}</div>
+            <div className="text-[11px] font-bold text-white/70 uppercase mt-0.5">Enrolled Candidates</div>
           </div>
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 text-center shadow-xs">
-            <div className="text-2xl font-black text-rose-600">{activeCohort.avgScore} <span className="text-xs text-slate-400 font-normal">/ 250</span></div>
-            <div className="text-[11px] font-bold text-slate-400 uppercase mt-0.5">Batch Average Score</div>
+          <div className="glass-panel p-5 rounded-2xl text-center shadow-sm">
+            <div className="text-2xl font-black text-rose-300">{activeCohort.avgScore} <span className="text-xs text-white/70 font-normal">/ 250</span></div>
+            <div className="text-[11px] font-bold text-white/70 uppercase mt-0.5">Batch Average Score</div>
           </div>
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 text-center shadow-xs">
-            <div className="text-2xl font-black text-emerald-600">{activeCohort.passRate}%</div>
-            <div className="text-[11px] font-bold text-slate-400 uppercase mt-0.5">Predicted Pass Rate</div>
+          <div className="glass-panel p-5 rounded-2xl text-center shadow-sm">
+            <div className="text-2xl font-black text-emerald-300">{activeCohort.passRate}%</div>
+            <div className="text-[11px] font-bold text-white/70 uppercase mt-0.5">Predicted Pass Rate</div>
           </div>
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 text-center shadow-xs">
-            <div className="text-2xl font-black text-indigo-600">{activeCohort.targetExamDate}</div>
-            <div className="text-[11px] font-bold text-slate-400 uppercase mt-0.5">Target Prometric Date</div>
+          <div className="glass-panel p-5 rounded-2xl text-center shadow-sm">
+            <div className="text-2xl font-black text-indigo-300">{activeCohort.targetExamDate}</div>
+            <div className="text-[11px] font-bold text-white/70 uppercase mt-0.5">Target Prometric Date</div>
           </div>
         </div>
 
         {/* Student Roster & Leaderboard */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+        <div className="rounded-[2.5rem] glass-panel shadow-2xl p-6 sm:p-8 space-y-6 text-white">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/15">
             <div>
-              <h2 className="text-xl font-black text-slate-900 tracking-tight">
+              <h2 className="text-xl font-black text-white tracking-tight">
                 Batch Leaderboard & Pass Probability
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-white/75">
                 Sorted by most recent Prometric simulation score and diagnostic pass prediction.
               </p>
             </div>
 
             <div className="relative w-full sm:w-64">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-white/60 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Search candidate name..."
                 value={studentSearch}
                 onChange={e => setStudentSearch(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-rose-500"
+                className="w-full pl-9 pr-3.5 py-2 text-xs rounded-full border border-white/25 bg-white/10 backdrop-blur text-white placeholder-white/60 focus:outline-none"
               />
             </div>
           </div>
@@ -184,7 +184,7 @@ export const ForInstitutes: React.FC = () => {
           {/* Roster Table */}
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold tracking-wider border-y border-slate-200">
+              <thead className="bg-white/10 text-white/80 uppercase text-[10px] font-bold tracking-wider border-y border-white/15">
                 <tr>
                   <th className="py-3 px-4">Candidate</th>
                   <th className="py-3 px-4">Tests Completed</th>
@@ -195,28 +195,28 @@ export const ForInstitutes: React.FC = () => {
                   <th className="py-3 px-4 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+              <tbody className="divide-y divide-white/10 font-medium text-white/90">
                 {filteredStudents.map(st => (
-                  <tr key={st.id} className="hover:bg-slate-50 transition">
+                  <tr key={st.id} className="hover:bg-white/10 transition">
                     <td className="py-3 px-4">
-                      <div className="font-bold text-slate-900">{st.name}</div>
-                      <div className="text-[10px] text-slate-400">{st.email}</div>
+                      <div className="font-bold text-white">{st.name}</div>
+                      <div className="text-[10px] text-white/60">{st.email}</div>
                     </td>
                     <td className="py-3 px-4">{st.testsTaken} Sets</td>
                     <td className="py-3 px-4 font-bold">
-                      <span className={st.lastScore >= 200 ? 'text-emerald-600' : 'text-rose-600'}>
+                      <span className={st.lastScore >= 200 ? 'text-emerald-300' : 'text-rose-300'}>
                         {st.lastScore} / 250
                       </span>
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
-                        <div className="w-16 bg-slate-200 h-2 rounded-full overflow-hidden">
+                        <div className="w-16 bg-white/20 h-2 rounded-full overflow-hidden">
                           <div
-                            className={`h-full ${st.passProbability >= 85 ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                            className={`h-full ${st.passProbability >= 85 ? 'bg-emerald-400' : 'bg-amber-400'}`}
                             style={{ width: `${st.passProbability}%` }}
                           ></div>
                         </div>
-                        <span className="font-bold">{st.passProbability}%</span>
+                        <span className="font-bold text-white">{st.passProbability}%</span>
                       </div>
                     </td>
                     <td className="py-3 px-4 text-slate-500">{st.weakArea}</td>

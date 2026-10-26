@@ -12,9 +12,9 @@ export const Footer: React.FC = () => {
 
   return (
     <>
-      <footer className="bg-slate-950/85 backdrop-blur-xl text-slate-300 font-sans border-t border-white/10 pt-16 pb-12 relative z-10">
+      <footer className="bg-black/25 backdrop-blur-2xl text-slate-200 font-sans border-t border-white/15 pt-16 pb-12 relative z-10 shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/15">
             {/* Column 1: Brand & Mission */}
             <div className="space-y-4">
               <div className="flex items-center gap-2.5">
@@ -22,10 +22,10 @@ export const Footer: React.FC = () => {
                   <img
                     src={themeConfig.customLogoUrl}
                     alt={themeConfig.instituteTitle}
-                    className="w-10 h-10 object-contain rounded-xl p-0.5 bg-white shadow-xs"
+                    className="w-10 h-10 object-contain rounded-full p-0.5 bg-white/10 border border-white/30 backdrop-blur shadow-sm"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 to-amber-500 flex items-center justify-center text-white font-black text-lg shadow-md shadow-rose-500/20">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-rose-500/80 to-amber-500/80 flex items-center justify-center text-white font-black text-lg shadow-md border border-white/30 backdrop-blur">
                     <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
                       <path d="M2 5h20v2h-2v13h-2V7H6v13H4V7H2V5zm3-3h14v2H5V2zm1 7h12v2H6V9z" />
                     </svg>
@@ -33,26 +33,26 @@ export const Footer: React.FC = () => {
                 )}
                 <div>
                   <span className="font-extrabold text-xl text-white tracking-tight">
-                    DAI ICHI <span className="text-rose-500">ACADEMY</span>
+                    DAI ICHI <span className="text-rose-400">ACADEMY</span>
                   </span>
-                  <span className="ml-1 text-[10px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-800/60">
+                  <span className="ml-1 text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-white/15 text-white border border-white/30 backdrop-blur">
                     CBT
                   </span>
                 </div>
               </div>
               <div>
-                <p className="text-xs font-bold text-rose-400">
+                <p className="text-xs font-bold text-rose-300">
                   {themeConfig.instituteTitle}
                 </p>
-                <p className="text-[11px] text-slate-400 italic">
+                <p className="text-[11px] text-white/70 italic">
                   {themeConfig.instituteSlogan}
                 </p>
               </div>
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <p className="text-xs text-white/80 leading-relaxed">
                 The premier Japanese language training academy and visa consultancy in Khulna. Offering official Computer-Based Testing (CBT) simulators for JFT-Basic, SSW Specified Skilled Worker Tokutei技能 1号, and JLPT candidates.
               </p>
-              <div className="flex items-center gap-2 text-[11px] text-emerald-400 font-semibold bg-emerald-950/60 border border-emerald-800/60 px-3 py-1.5 rounded-lg w-fit">
-                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+              <div className="flex items-center gap-2 text-[11px] text-emerald-300 font-semibold bg-emerald-500/20 border border-emerald-400/40 px-3 py-1.5 rounded-full w-fit backdrop-blur">
+                <ShieldCheck className="w-4 h-4 text-emerald-300 shrink-0" />
                 <span>100% Prometric CBT Engine Replica</span>
               </div>
             </div>
@@ -208,18 +208,18 @@ export const Footer: React.FC = () => {
 
       {/* Legal Modal */}
       {legalModalTitle && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="font-extrabold text-base text-slate-900">{legalModalTitle}</h3>
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-panel text-white rounded-[2rem] max-w-lg w-full p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-white/15 pb-3">
+              <h3 className="font-extrabold text-base text-white">{legalModalTitle}</h3>
               <button
                 onClick={() => setLegalModalTitle(null)}
-                className="w-7 h-7 rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center text-xs font-bold"
+                className="w-7 h-7 rounded-full bg-white/15 text-white/80 hover:text-white flex items-center justify-center text-xs font-bold transition border border-white/20"
               >
                 ✕
               </button>
             </div>
-            <div className="text-xs text-slate-600 space-y-3 max-h-80 overflow-y-auto leading-relaxed pr-1">
+            <div className="text-xs text-white/80 space-y-3 max-h-80 overflow-y-auto leading-relaxed pr-1">
               {legalModalTitle === 'Privacy Policy' && (
                 <>
                   <p><strong>1. Data Collection & Local Storage:</strong> JFT Guru stores your exam progress, selected answers, audio play count counters, and weak point analytics in your browser’s local storage to enable uninterrupted test-taking even in the event of brief network drops.</p>
@@ -254,7 +254,7 @@ export const Footer: React.FC = () => {
             <div className="pt-2 flex justify-end">
               <button
                 onClick={() => setLegalModalTitle(null)}
-                className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition"
+                className="px-5 py-2 glass-btn-primary rounded-full text-xs font-bold transition"
               >
                 Close
               </button>

@@ -90,14 +90,14 @@ export const Navbar: React.FC = () => {
               </div>
             </div>
 
-            {/* Desktop Navigation Links — Translucent Glass Capsule Items */}
-            <nav className="hidden lg:flex items-center gap-1">
+            {/* Desktop Navigation Links — Every Option as Transparent Capsule Shape */}
+            <nav className="hidden lg:flex items-center gap-1.5">
               <button
                 onClick={() => handleNav('landing')}
-                className={`px-3.5 py-1.5 text-xs rounded-full transition flex items-center gap-1.5 ${
+                className={`px-3.5 py-1.5 text-xs rounded-full transition-all flex items-center gap-1.5 ${
                   currentView === 'landing'
                     ? 'glass-capsule-item-active'
-                    : 'text-white/80 hover:text-white hover:bg-white/10 font-semibold'
+                    : 'glass-capsule-item'
                 }`}
               >
                 <Home className="w-3.5 h-3.5" />
@@ -109,10 +109,10 @@ export const Navbar: React.FC = () => {
                 <button
                   onClick={() => setMockTestsDropdownOpen(!mockTestsDropdownOpen)}
                   onBlur={() => setTimeout(() => setMockTestsDropdownOpen(false), 200)}
-                  className={`px-3.5 py-1.5 text-xs rounded-full transition flex items-center gap-1 ${
+                  className={`px-3.5 py-1.5 text-xs rounded-full transition-all flex items-center gap-1 ${
                     currentView === 'mock-tests' || currentView === 'exam' || currentView === 'preview'
                       ? 'glass-capsule-item-active'
-                      : 'text-white/80 hover:text-white hover:bg-white/10 font-semibold'
+                      : 'glass-capsule-item'
                   }`}
                 >
                   <Layers className="w-3.5 h-3.5" />
@@ -188,10 +188,10 @@ export const Navbar: React.FC = () => {
 
               <button
                 onClick={() => handleNav('tools')}
-                className={`px-3.5 py-1.5 text-xs rounded-full transition flex items-center gap-1.5 ${
+                className={`px-3.5 py-1.5 text-xs rounded-full transition-all flex items-center gap-1.5 ${
                   currentView === 'tools'
                     ? 'glass-capsule-item-active'
-                    : 'text-white/80 hover:text-white hover:bg-white/10 font-semibold'
+                    : 'glass-capsule-item'
                 }`}
               >
                 <Compass className="w-3.5 h-3.5" />
@@ -201,10 +201,10 @@ export const Navbar: React.FC = () => {
 
               <button
                 onClick={() => handleNav('ai-speaking')}
-                className={`px-3.5 py-1.5 text-xs rounded-full transition flex items-center gap-1.5 ${
+                className={`px-3.5 py-1.5 text-xs rounded-full transition-all flex items-center gap-1.5 ${
                   currentView === 'ai-speaking'
                     ? 'glass-capsule-item-active'
-                    : 'text-white/80 hover:text-white hover:bg-white/10 font-semibold'
+                    : 'glass-capsule-item'
                 }`}
               >
                 <Mic className="w-3.5 h-3.5" />
@@ -213,10 +213,10 @@ export const Navbar: React.FC = () => {
 
               <button
                 onClick={() => handleNav('store')}
-                className={`px-3.5 py-1.5 text-xs rounded-full transition flex items-center gap-1.5 ${
+                className={`px-3.5 py-1.5 text-xs rounded-full transition-all flex items-center gap-1.5 ${
                   currentView === 'store'
                     ? 'glass-capsule-item-active'
-                    : 'text-white/80 hover:text-white hover:bg-white/10 font-semibold'
+                    : 'glass-capsule-item'
                 }`}
               >
                 <ShoppingBag className="w-3.5 h-3.5" />
@@ -225,10 +225,10 @@ export const Navbar: React.FC = () => {
 
               <button
                 onClick={() => handleNav('institutes')}
-                className={`px-3.5 py-1.5 text-xs rounded-full transition flex items-center gap-1.5 ${
+                className={`px-3.5 py-1.5 text-xs rounded-full transition-all flex items-center gap-1.5 ${
                   currentView === 'institutes'
                     ? 'glass-capsule-item-active'
-                    : 'text-white/80 hover:text-white hover:bg-white/10 font-semibold'
+                    : 'glass-capsule-item'
                 }`}
               >
                 <Building2 className="w-3.5 h-3.5" />
@@ -237,10 +237,10 @@ export const Navbar: React.FC = () => {
 
               <button
                 onClick={() => handleNav('blog')}
-                className={`px-3.5 py-1.5 text-xs rounded-full transition flex items-center gap-1.5 ${
+                className={`px-3.5 py-1.5 text-xs rounded-full transition-all flex items-center gap-1.5 ${
                   currentView === 'blog'
                     ? 'glass-capsule-item-active'
-                    : 'text-white/80 hover:text-white hover:bg-white/10 font-semibold'
+                    : 'glass-capsule-item'
                 }`}
               >
                 <Newspaper className="w-3.5 h-3.5" />
@@ -248,12 +248,12 @@ export const Navbar: React.FC = () => {
               </button>
             </nav>
 
-            {/* Right Actions: Capsules */}
+            {/* Right Actions: Transparent Capsules */}
             <div className="flex items-center gap-2">
               {/* Study Streak Pill */}
               <div
                 title={`${currentUser.streak || 7}-day study streak! Keep practicing daily.`}
-                className="hidden md:flex items-center gap-1 px-3 py-1 bg-amber-500/20 border border-amber-400/40 rounded-full text-xs font-bold text-amber-200 backdrop-blur cursor-default"
+                className="hidden xl:flex items-center gap-1 px-3 py-1.5 glass-capsule-item rounded-full text-xs font-bold text-amber-200 cursor-default"
               >
                 <Flame className="w-3.5 h-3.5 text-amber-300 fill-amber-300 animate-pulse" />
                 <span>{currentUser.streak || 7} Days</span>
@@ -262,10 +262,10 @@ export const Navbar: React.FC = () => {
               {/* User Plan / Credits Capsule */}
               <button
                 onClick={() => setPricingModalOpen(true)}
-                className={`px-3 py-1.5 rounded-full text-xs font-bold border transition flex items-center gap-1.5 backdrop-blur-md ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
                   isPro
-                    ? 'bg-amber-500/25 border-amber-400/50 text-amber-200 hover:bg-amber-500/35'
-                    : 'bg-white/15 border-white/30 text-white hover:bg-white/25'
+                    ? 'bg-amber-500/25 border border-amber-400/50 text-amber-200 hover:bg-amber-500/35 backdrop-blur-md shadow-sm'
+                    : 'glass-capsule-item text-white'
                 }`}
               >
                 {isPro ? (
@@ -287,7 +287,7 @@ export const Navbar: React.FC = () => {
                 <button
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                   onBlur={() => setTimeout(() => setProfileDropdownOpen(false), 200)}
-                  className="w-9 h-9 rounded-full bg-white/15 hover:bg-white/25 border border-white/35 flex items-center justify-center text-white backdrop-blur transition shadow-sm"
+                  className="w-9 h-9 rounded-full glass-capsule-item flex items-center justify-center text-white transition shadow-sm"
                 >
                   <User className="w-4 h-4" />
                 </button>
@@ -400,55 +400,69 @@ export const Navbar: React.FC = () => {
 
           {/* Mobile Navigation Drawer */}
           {mobileMenuOpen && (
-            <div className="lg:hidden py-4 border-t border-white/15 space-y-1 animate-in fade-in">
+            <div className="lg:hidden py-4 border-t border-white/15 space-y-2 animate-in fade-in">
               <button
                 onClick={() => handleNav('landing')}
-                className="w-full text-left px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/15 rounded-2xl"
+                className={`w-full text-left px-4 py-2.5 text-xs font-bold rounded-full transition-all flex items-center justify-between ${
+                  currentView === 'landing' ? 'glass-capsule-item-active' : 'glass-capsule-item'
+                }`}
               >
-                Home
+                <span>Home</span>
               </button>
               <button
                 onClick={() => handleNav('mock-tests')}
-                className="w-full text-left px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/15 rounded-2xl flex items-center justify-between"
+                className={`w-full text-left px-4 py-2.5 text-xs font-bold rounded-full transition-all flex items-center justify-between ${
+                  currentView === 'mock-tests' ? 'glass-capsule-item-active' : 'glass-capsule-item'
+                }`}
               >
                 <span>Mock Tests (24+ Sets)</span>
-                <span className="text-xs bg-rose-500/25 text-rose-200 font-bold px-2 py-0.5 rounded-full border border-rose-400/40">All Tracks</span>
+                <span className="text-[10px] bg-rose-500/25 text-rose-200 font-bold px-2 py-0.5 rounded-full border border-rose-400/40">All Tracks</span>
               </button>
               <button
                 onClick={() => handleNav('tools')}
-                className="w-full text-left px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/15 rounded-2xl flex items-center justify-between"
+                className={`w-full text-left px-4 py-2.5 text-xs font-bold rounded-full transition-all flex items-center justify-between ${
+                  currentView === 'tools' ? 'glass-capsule-item-active' : 'glass-capsule-item'
+                }`}
               >
                 <span>25 Japanese Tools</span>
-                <span className="text-xs bg-emerald-500/25 text-emerald-200 font-bold px-2 py-0.5 rounded-full border border-emerald-400/40">100% Free</span>
+                <span className="text-[10px] bg-emerald-500/25 text-emerald-200 font-bold px-2 py-0.5 rounded-full border border-emerald-400/40">100% Free</span>
               </button>
               <button
                 onClick={() => handleNav('ai-speaking')}
-                className="w-full text-left px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/15 rounded-2xl"
+                className={`w-full text-left px-4 py-2.5 text-xs font-bold rounded-full transition-all flex items-center justify-between ${
+                  currentView === 'ai-speaking' ? 'glass-capsule-item-active' : 'glass-capsule-item'
+                }`}
               >
-                AI Speaking & Interview Coach
+                <span>AI Speaking & Interview Coach</span>
               </button>
               <button
                 onClick={() => handleNav('store')}
-                className="w-full text-left px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/15 rounded-2xl"
+                className={`w-full text-left px-4 py-2.5 text-xs font-bold rounded-full transition-all flex items-center justify-between ${
+                  currentView === 'store' ? 'glass-capsule-item-active' : 'glass-capsule-item'
+                }`}
               >
-                Digital Book Store
+                <span>Digital Book Store</span>
               </button>
               <button
                 onClick={() => handleNav('institutes')}
-                className="w-full text-left px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/15 rounded-2xl"
+                className={`w-full text-left px-4 py-2.5 text-xs font-bold rounded-full transition-all flex items-center justify-between ${
+                  currentView === 'institutes' ? 'glass-capsule-item-active' : 'glass-capsule-item'
+                }`}
               >
-                For Language Academies & Institutes
+                <span>For Language Academies & Institutes</span>
               </button>
               <button
                 onClick={() => handleNav('blog')}
-                className="w-full text-left px-4 py-2 text-sm font-semibold text-white/90 hover:bg-white/15 rounded-2xl"
+                className={`w-full text-left px-4 py-2.5 text-xs font-bold rounded-full transition-all flex items-center justify-between ${
+                  currentView === 'blog' ? 'glass-capsule-item-active' : 'glass-capsule-item'
+                }`}
               >
-                Exam Guides & Blog
+                <span>Exam Guides & Blog</span>
               </button>
               <div className="pt-2 border-t border-white/15 flex gap-2">
                 <button
                   onClick={() => setAuthModalOpen(true)}
-                  className="flex-1 py-2 text-center text-xs font-bold text-white bg-white/15 rounded-full border border-white/30"
+                  className="flex-1 py-2 text-center text-xs font-bold text-white glass-capsule-item rounded-full"
                 >
                   Sign In
                 </button>

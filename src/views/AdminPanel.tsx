@@ -247,24 +247,24 @@ export const AdminPanel: React.FC = () => {
   };
 
   return (
-    <div className="w-full min-h-screen space-y-5 font-sans p-2 sm:p-4 md:p-6">
+    <div className="w-full min-h-screen space-y-5 font-sans p-2 sm:p-4 md:p-6 text-white relative">
       {/* Admin Panel Header with Institute Branding & Glass Styling */}
-      <div className="bg-gradient-to-r from-slate-900/90 via-indigo-950/90 to-slate-900/90 backdrop-blur-2xl border border-white/20 rounded-3xl p-6 sm:p-8 text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-2xl">
+      <div className="rounded-[2.25rem] glass-panel p-6 sm:p-8 text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-2xl border border-white/30 backdrop-blur-2xl">
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/15 text-white border border-white/30 backdrop-blur">
+              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
               <span>Password-Protected Control Center</span>
             </div>
 
             {currentUser.role === 'admin' ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-600/30 text-indigo-200 border border-indigo-500/40">
-                <ShieldAlert className="w-3.5 h-3.5 text-indigo-400" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/30 text-indigo-200 border border-indigo-400/40 backdrop-blur">
+                <ShieldAlert className="w-3.5 h-3.5 text-indigo-300" />
                 <span>Super Admin: Master Privileges</span>
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                <GraduationCap className="w-3.5 h-3.5 text-amber-400" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-200 border border-amber-400/40 backdrop-blur">
+                <GraduationCap className="w-3.5 h-3.5 text-amber-300" />
                 <span>Teacher: {currentUser.full_name}</span>
               </span>
             )}
@@ -275,15 +275,15 @@ export const AdminPanel: React.FC = () => {
               <img
                 src={themeConfig.customLogoUrl}
                 alt="Logo"
-                className="w-10 h-10 object-contain rounded-xl p-0.5 bg-white/10 border border-white/20 backdrop-blur"
+                className="w-10 h-10 object-contain rounded-full p-0.5 bg-white/10 border border-white/30 backdrop-blur shadow-sm"
               />
             )}
             <div>
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tight flex items-center gap-2">
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white flex items-center gap-2">
                 <span>{themeConfig.instituteName}</span>
               </h1>
-              <p className="text-xs sm:text-sm font-semibold text-rose-400">
-                {themeConfig.instituteTitle} — <span className="text-slate-300 font-normal italic">{themeConfig.instituteSlogan}</span>
+              <p className="text-xs sm:text-sm font-semibold text-rose-300">
+                {themeConfig.instituteTitle} — <span className="text-white/80 font-normal italic">{themeConfig.instituteSlogan}</span>
               </p>
             </div>
           </div>
@@ -293,33 +293,35 @@ export const AdminPanel: React.FC = () => {
         <div className="flex items-center gap-2 self-start md:self-auto">
           <button
             onClick={adminLogout}
-            className="px-3.5 py-2 bg-red-950/70 hover:bg-red-900 border border-red-700/60 text-red-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-red-950/50"
+            className="px-4 py-2 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-400/40 text-rose-200 rounded-full text-xs font-bold transition flex items-center gap-1.5 shadow-md backdrop-blur"
             title="Lock Admin Session and Require Re-Authentication"
           >
-            <Lock className="w-3.5 h-3.5 text-red-400" />
+            <Lock className="w-3.5 h-3.5 text-rose-300" />
             <span>Lock & Exit Session</span>
           </button>
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="flex items-center gap-1.5 bg-slate-900/80 backdrop-blur-xl p-1.5 rounded-2xl border border-white/10 overflow-x-auto">
+      {/* Tab Navigation — Every Option as Transparent Capsule */}
+      <div className="flex items-center gap-1.5 rounded-full glass-capsule-bar p-2 overflow-x-auto shadow-xl">
         <button
           onClick={() => setActiveAdminTab('setup')}
-          className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1.5 ${
+          className={`px-4 py-2 rounded-full text-xs font-black transition-all flex items-center gap-1.5 ${
             activeAdminTab === 'setup'
-              ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
-              : 'text-blue-300 hover:text-white bg-blue-950/60 border border-blue-500/30'
+              ? 'glass-capsule-item-active'
+              : 'glass-capsule-item'
           }`}
         >
-          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <Sparkles className="w-3.5 h-3.5 text-amber-300" />
           <span>ADMIN SETUP (Model)</span>
           <span className="bg-amber-400 text-slate-900 text-[9px] font-black px-1.5 py-0.2 rounded-full uppercase">NEW</span>
         </button>
         <button
           onClick={() => setActiveAdminTab('split-screen')}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-            activeAdminTab === 'split-screen' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
+          className={`px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
+            activeAdminTab === 'split-screen'
+              ? 'glass-capsule-item-active'
+              : 'glass-capsule-item'
           }`}
         >
           <Columns className="w-3.5 h-3.5" />
@@ -327,51 +329,63 @@ export const AdminPanel: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveAdminTab('theme')}
-          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-            activeAdminTab === 'theme' ? 'bg-amber-600 text-white shadow-xs' : 'text-amber-300 hover:text-white bg-amber-950/40 border border-amber-500/30'
+          className={`px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
+            activeAdminTab === 'theme'
+              ? 'glass-capsule-item-active'
+              : 'glass-capsule-item'
           }`}
         >
-          <Palette className="w-3.5 h-3.5 text-amber-400" />
+          <Palette className="w-3.5 h-3.5 text-amber-300" />
           <span>Theme & Glass Control</span>
           <span className="bg-amber-400 text-slate-900 text-[9px] font-black px-1.5 py-0.2 rounded-full uppercase">NEW</span>
         </button>
         <button
           onClick={() => setActiveAdminTab('security')}
-          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-            activeAdminTab === 'security' ? 'bg-rose-600 text-white shadow-md shadow-rose-500/30' : 'text-rose-300 hover:text-white bg-rose-950/40 border border-rose-500/30'
+          className={`px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
+            activeAdminTab === 'security'
+              ? 'glass-capsule-item-active'
+              : 'glass-capsule-item'
           }`}
         >
-          <KeyRound className="w-3.5 h-3.5 text-rose-400" />
+          <KeyRound className="w-3.5 h-3.5 text-rose-300" />
           <span>Security & Credentials</span>
         </button>
         <button
           onClick={() => setActiveAdminTab('overview')}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-            activeAdminTab === 'overview' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
+          className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+            activeAdminTab === 'overview'
+              ? 'glass-capsule-item-active'
+              : 'glass-capsule-item'
           }`}
         >
           Overview
         </button>
         <button
           onClick={() => setActiveAdminTab('tests')}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-            activeAdminTab === 'tests' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
+          className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+            activeAdminTab === 'tests'
+              ? 'glass-capsule-item-active'
+              : 'glass-capsule-item'
           }`}
         >
           Mock Tests
         </button>
         <button
           onClick={() => setActiveAdminTab('questions')}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-            activeAdminTab === 'questions' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
+          className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+            activeAdminTab === 'questions'
+              ? 'glass-capsule-item-active'
+              : 'glass-capsule-item'
           }`}
         >
           Questions
         </button>
         <button
           onClick={() => setActiveAdminTab('users')}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-            activeAdminTab === 'users' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
+          className={`px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
+            activeAdminTab === 'users'
+              ? 'glass-capsule-item-active'
+              : 'glass-capsule-item'
           }`}
         >
           <Users className="w-3.5 h-3.5" />
@@ -379,8 +393,10 @@ export const AdminPanel: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveAdminTab('storage')}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-            activeAdminTab === 'storage' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
+          className={`px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
+            activeAdminTab === 'storage'
+              ? 'glass-capsule-item-active'
+              : 'glass-capsule-item'
           }`}
         >
           <Database className="w-3.5 h-3.5" />
@@ -388,8 +404,10 @@ export const AdminPanel: React.FC = () => {
         </button>
         <button
           onClick={() => setActiveAdminTab('import')}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-            activeAdminTab === 'import' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-300 hover:text-white'
+          className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
+            activeAdminTab === 'import'
+              ? 'glass-capsule-item-active'
+              : 'glass-capsule-item'
           }`}
         >
           Import JSON/Excel

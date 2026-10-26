@@ -240,30 +240,30 @@ export const ToolsHub: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans py-8">
+    <div className="min-h-screen font-sans py-8 text-white relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Banner */}
-        <div className="bg-gradient-to-r from-rose-600 via-red-600 to-amber-600 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="rounded-[2.25rem] glass-panel p-6 sm:p-8 text-white shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 border border-white/30 backdrop-blur-2xl">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/20 text-white border border-white/30 backdrop-blur">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/15 text-white border border-white/30 backdrop-blur">
               <Compass className="w-3.5 h-3.5" />
               <span>100% Free Forever • No Account Required</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
               25 Free Japanese Learning Tools
             </h1>
-            <p className="text-xs sm:text-sm text-rose-100 leading-relaxed">
+            <p className="text-xs sm:text-sm text-white/85 leading-relaxed">
               Everything from interactive Hiragana/Katakana audio charts, Kanji stroke order visualizer, Verb conjugator, Particle quiz, Japan salary calculator, to AI flashcards.
             </p>
           </div>
 
-          <div className="bg-white/15 backdrop-blur p-4 rounded-2xl border border-white/20 text-center shrink-0">
-            <div className="text-3xl font-black">25 Tools</div>
-            <div className="text-[11px] font-bold text-rose-100">Ready to Use</div>
+          <div className="bg-white/10 backdrop-blur p-4 rounded-2xl border border-white/20 text-center shrink-0 shadow-sm">
+            <div className="text-3xl font-black text-rose-300">25 Tools</div>
+            <div className="text-[11px] font-bold text-white/80">Ready to Use</div>
           </div>
         </div>
 
-        {/* Category Tabs */}
+        {/* Category Tabs — Every option transparent capsule */}
         <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
           {[
             { id: 'all', label: 'All 25 Tools', count: 25 },
@@ -276,16 +276,16 @@ export const ToolsHub: React.FC = () => {
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
                 activeCategory === cat.id
-                  ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30'
-                  : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+                  ? 'glass-capsule-item-active'
+                  : 'glass-capsule-item'
               }`}
             >
               <span>{cat.label}</span>
               <span
-                className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                  activeCategory === cat.id ? 'bg-rose-800 text-white' : 'bg-slate-100 text-slate-600'
+                className={`text-[10px] px-2 py-0.5 rounded-full ${
+                  activeCategory === cat.id ? 'bg-white/30 text-white' : 'bg-white/10 text-white/70'
                 }`}
               >
                 {cat.count}
@@ -300,21 +300,21 @@ export const ToolsHub: React.FC = () => {
             <div
               key={tool.id}
               onClick={() => setActiveToolId(tool.id)}
-              className="bg-white border border-slate-200 hover:border-rose-300 rounded-3xl p-6 space-y-4 shadow-xs hover:shadow-md transition cursor-pointer flex flex-col justify-between group"
+              className="rounded-[2.25rem] glass-panel p-6 space-y-4 shadow-xl hover:shadow-2xl transition cursor-pointer flex flex-col justify-between group"
             >
               <div className="space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl font-bold shadow-2xs group-hover:scale-105 transition-transform">
+                <div className="w-12 h-12 rounded-2xl bg-white/15 text-white border border-white/25 flex items-center justify-center text-xl font-bold shadow-sm backdrop-blur group-hover:scale-105 transition-transform">
                   {tool.icon}
                 </div>
-                <h3 className="text-base font-extrabold text-slate-900 group-hover:text-rose-600 transition leading-snug">
+                <h3 className="text-base font-black text-white group-hover:text-rose-300 transition leading-snug">
                   {tool.name}
                 </h3>
-                <p className="text-xs text-slate-500 leading-relaxed">
+                <p className="text-xs text-white/80 leading-relaxed">
                   {tool.desc}
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-rose-600">
+              <div className="pt-3 border-t border-white/15 flex items-center justify-between text-xs font-bold text-rose-300 group-hover:text-white transition">
                 <span>Launch Interactive Tool</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -327,11 +327,11 @@ export const ToolsHub: React.FC = () => {
           INTERACTIVE TOOL WORKBENCH MODALS (For All 25 Tools)
           ========================================================================= */}
       {activeToolId && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-3xl w-full p-6 sm:p-8 space-y-6 shadow-2xl animate-in fade-in zoom-in-95 my-8 relative">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+          <div className="glass-panel text-white rounded-[2.5rem] max-w-3xl w-full p-6 sm:p-8 space-y-6 shadow-2xl animate-in fade-in zoom-in-95 my-8 relative border border-white/30 backdrop-blur-2xl">
             <button
               onClick={() => setActiveToolId(null)}
-              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold transition"
+              className="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 border border-white/30 text-white flex items-center justify-center text-xs font-bold transition"
             >
               ✕
             </button>

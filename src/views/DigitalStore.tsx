@@ -43,26 +43,26 @@ export const DigitalStore: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans py-8">
+    <div className="min-h-screen font-sans py-8 text-white relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Store Banner */}
-        <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="rounded-[2.25rem] glass-panel p-6 sm:p-8 text-white shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 border border-white/30 backdrop-blur-2xl">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
-              <BookOpen className="w-3.5 h-3.5 text-amber-400" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/15 text-white border border-white/30 backdrop-blur">
+              <BookOpen className="w-3.5 h-3.5 text-amber-300" />
               <span>Official Digital E-Books & Revision Notes</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
               JFT & SSW Digital Study Book Store
             </h1>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            <p className="text-xs sm:text-sm text-white/85 leading-relaxed">
               Carefully curated by licensed Japanese educators for rapid exam revision. Instant secure digital access with our built-in e-book reader.
             </p>
           </div>
 
-          <div className="bg-white/10 backdrop-blur p-4 rounded-2xl border border-white/15 text-center shrink-0">
-            <div className="text-3xl font-black text-rose-400">{INITIAL_EBOOKS.length} Titles</div>
-            <div className="text-[11px] font-bold text-slate-300">Free Preview Available</div>
+          <div className="bg-white/10 backdrop-blur p-4 rounded-2xl border border-white/20 text-center shrink-0 shadow-sm">
+            <div className="text-3xl font-black text-rose-300">{INITIAL_EBOOKS.length} Titles</div>
+            <div className="text-[11px] font-bold text-white/80">Free Preview Available</div>
           </div>
         </div>
 
@@ -71,7 +71,7 @@ export const DigitalStore: React.FC = () => {
           {INITIAL_EBOOKS.map(book => (
             <div
               key={book.id}
-              className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xs hover:shadow-md transition flex flex-col justify-between group"
+              className="rounded-[2.25rem] glass-panel overflow-hidden shadow-xl hover:shadow-2xl transition flex flex-col justify-between group"
             >
               {/* Book Header / Simulated Cover */}
               <div className={`p-6 bg-gradient-to-tr ${book.coverColor} text-white space-y-3 relative`}>
@@ -82,11 +82,11 @@ export const DigitalStore: React.FC = () => {
                 )}
                 <div>
                   <h3 className="text-lg font-black leading-snug line-clamp-2">{book.title}</h3>
-                  <p className="text-xs text-slate-200 font-japanese mt-1 opacity-90">{book.japaneseTitle}</p>
+                  <p className="text-xs text-white/80 font-japanese mt-1">{book.japaneseTitle}</p>
                 </div>
-                <div className="flex items-center gap-3 text-[11px] text-slate-200">
+                <div className="flex items-center gap-3 text-[11px] text-white/80">
                   <span className="flex items-center gap-1">
-                    <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                    <Star className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
                     <strong>{book.rating}</strong> ({book.reviewCount})
                   </span>
                   <span>•</span>
@@ -96,18 +96,18 @@ export const DigitalStore: React.FC = () => {
 
               {/* Book Description & TOC Preview */}
               <div className="p-6 space-y-4">
-                <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
+                <p className="text-xs text-white/80 line-clamp-3 leading-relaxed">
                   {book.description}
                 </p>
 
-                <div className="space-y-1.5 pt-2 border-t border-slate-100">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <div className="space-y-1.5 pt-2 border-t border-white/15">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/60">
                     Sample Table of Contents:
                   </span>
-                  <ul className="space-y-1 text-xs text-slate-600">
+                  <ul className="space-y-1 text-xs text-white/80">
                     {book.tableOfContents.slice(0, 3).map((ch, idx) => (
                       <li key={idx} className="flex items-center gap-1.5 truncate">
-                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0"></span>
                         <span className="truncate">{ch}</span>
                       </li>
                     ))}
@@ -116,24 +116,24 @@ export const DigitalStore: React.FC = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3">
+              <div className="p-4 bg-white/5 border-t border-white/15 flex items-center justify-between gap-3">
                 <div>
-                  <span className="text-[10px] text-slate-400 uppercase font-bold block">Instant PDF</span>
-                  <span className="text-lg font-black text-slate-900">${book.price}</span>
+                  <span className="text-[10px] text-white/60 uppercase font-bold block">Instant PDF</span>
+                  <span className="text-lg font-black text-white">${book.price}</span>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleOpenViewer(book)}
-                    className="px-3 py-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-2xs"
+                    className="px-3.5 py-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white rounded-full text-xs font-bold transition flex items-center gap-1 backdrop-blur"
                   >
-                    <Eye className="w-3.5 h-3.5 text-slate-400" />
+                    <Eye className="w-3.5 h-3.5 text-white/70" />
                     <span>Read Preview</span>
                   </button>
 
                   <button
                     onClick={() => handleSimulatePurchase(book)}
-                    className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-rose-600/30"
+                    className="px-4 py-2 glass-btn-primary text-white rounded-full text-xs font-bold transition flex items-center gap-1.5 shadow-md"
                   >
                     <ShoppingBag className="w-3.5 h-3.5" />
                     <span>Buy Now</span>

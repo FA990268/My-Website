@@ -6,7 +6,6 @@ import { CookieBanner } from './components/CookieBanner';
 import { AuthModal } from './components/AuthModal';
 import { PricingModal } from './components/PricingModal';
 import { VideoDemoModal } from './components/VideoDemoModal';
-import { DemoToolbar } from './components/DemoToolbar';
 import { AdminGuard } from './components/AdminGuard';
 import { VisualEditorToolbar } from './components/VisualEditorToolbar';
 
@@ -43,16 +42,9 @@ export function App() {
       {/* Dynamic Background Glassy Overlay */}
       {themeConfig.backgroundImageUrl && (
         <div
-          className="fixed inset-0 pointer-events-none transition-all duration-300 z-0"
-          style={{
-            backgroundColor: themeConfig.fullTransparency ? 'rgba(0, 0, 0, 0.1)' : 'rgba(248, 250, 252, 0.82)',
-            backdropFilter: themeConfig.isGlassEnabled ? `blur(${themeConfig.glassBlur}px)` : undefined
-          }}
+          className="fixed inset-0 pointer-events-none transition-all duration-300 z-0 bg-black/15 backdrop-blur-[2px]"
         />
       )}
-
-      {/* 1-Click Role Switcher Demo Control Bar */}
-      <DemoToolbar />
 
       {/* Global Navbar (hidden during live CBT exam for Prometric full-screen immersion) */}
       {!isExamLive && <Navbar />}

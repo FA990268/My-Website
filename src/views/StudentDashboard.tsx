@@ -52,27 +52,27 @@ export const StudentDashboard: React.FC = () => {
   const weakest = sectionsRanking[0];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-white font-sans">
       {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-6 md:p-8 text-white shadow-md relative overflow-hidden">
+      <div className="rounded-[2.25rem] glass-panel p-6 md:p-8 text-white shadow-2xl relative overflow-hidden border border-white/30 backdrop-blur-2xl">
         <div className="relative z-10 max-w-xl space-y-2">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-orange-500/20 text-orange-400 border border-orange-500/30">
+            <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-white/15 text-white border border-white/30 backdrop-blur">
               JFT-Basic Official CBT Simulation
             </span>
-            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
               currentUser.subscription_tier === 'pro'
-                ? 'bg-amber-400 text-slate-950'
-                : 'bg-slate-700 text-slate-300'
+                ? 'bg-amber-400 text-slate-950 font-black'
+                : 'bg-white/20 text-white border border-white/20'
             }`}>
               {currentUser.subscription_tier.toUpperCase()} MEMBER
             </span>
           </div>
 
-          <h1 className="text-2xl md:text-3xl font-black tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white">
             Welcome back, {currentUser.full_name}!
           </h1>
-          <p className="text-xs md:text-sm text-slate-300 leading-relaxed">
+          <p className="text-xs md:text-sm text-white/85 leading-relaxed">
             Prepare for the Japan Foundation Test for Basic Japanese with accurate Prometric CBT conditions, 60-minute single countdown, one-way section lock, and 250-point scoring.
           </p>
 
@@ -80,7 +80,7 @@ export const StudentDashboard: React.FC = () => {
             {activeAttempt ? (
               <button
                 onClick={() => navigateTo('exam', { testId: activeAttempt.mock_test_id })}
-                className="px-5 py-2.5 bg-orange-600 hover:bg-orange-500 text-white rounded-lg text-xs font-bold shadow-lg shadow-orange-500/30 flex items-center gap-2 transition active:scale-95 animate-pulse"
+                className="px-6 py-2.5 glass-btn-primary text-white rounded-full text-xs font-bold shadow-lg flex items-center gap-2 transition animate-pulse"
               >
                 <Clock className="w-4 h-4" />
                 <span>Resume Ongoing Exam</span>
@@ -88,7 +88,7 @@ export const StudentDashboard: React.FC = () => {
             ) : (
               <button
                 onClick={() => navigateTo('mock-tests')}
-                className="px-5 py-2.5 bg-orange-600 hover:bg-orange-500 text-white rounded-lg text-xs font-bold shadow-lg shadow-orange-500/30 flex items-center gap-2 transition active:scale-95"
+                className="px-6 py-2.5 glass-btn-primary text-white rounded-full text-xs font-bold shadow-lg flex items-center gap-2 transition"
               >
                 <Play className="w-4 h-4 fill-white" />
                 <span>Launch Mock Exam</span>
@@ -96,74 +96,74 @@ export const StudentDashboard: React.FC = () => {
             )}
 
             <button
-              onClick={() => navigateTo('section-practice')}
-              className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white rounded-lg text-xs font-semibold flex items-center gap-2 transition"
+              onClick={() => navigateTo('tools')}
+              className="px-5 py-2.5 glass-capsule-item text-white rounded-full text-xs font-semibold flex items-center gap-2 transition"
             >
-              <Layers className="w-4 h-4 text-orange-400" />
-              <span>Targeted Section Practice</span>
+              <Layers className="w-4 h-4 text-amber-300" />
+              <span>Free Japanese Tools</span>
             </button>
           </div>
         </div>
 
         {/* Decorative badge background icon */}
-        <Award className="absolute -right-6 -bottom-6 w-48 h-48 text-white/5 pointer-events-none" />
+        <Award className="absolute -right-6 -bottom-6 w-48 h-48 text-white/10 pointer-events-none" />
       </div>
 
       {/* 4 OVERVIEW STATS CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Total Tests Taken */}
-        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+        <div className="glass-panel p-5 rounded-3xl shadow-lg border border-white/25 flex items-center gap-4 text-white">
+          <div className="p-3 bg-white/15 text-white rounded-2xl border border-white/20 backdrop-blur">
             <BookOpen className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Tests Taken</span>
-            <h3 className="text-2xl font-black text-slate-900 mt-0.5">{totalTaken}</h3>
-            <p className="text-[10px] text-slate-500">Official full mock exams</p>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-white/70">Total Tests Taken</span>
+            <h3 className="text-2xl font-black text-white mt-0.5">{totalTaken}</h3>
+            <p className="text-[10px] text-white/60">Official full mock exams</p>
           </div>
         </div>
 
         {/* Card 2: Average Score out of 250 */}
-        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+        <div className="glass-panel p-5 rounded-3xl shadow-lg border border-white/25 flex items-center gap-4 text-white">
+          <div className="p-3 bg-emerald-500/20 text-emerald-300 rounded-2xl border border-emerald-400/30 backdrop-blur">
             <Award className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Average Score</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-white/70">Average Score</span>
             <div className="flex items-baseline gap-1 mt-0.5">
-              <h3 className="text-2xl font-black text-slate-900">{averageScore}</h3>
-              <span className="text-xs font-semibold text-slate-400">/ 250</span>
+              <h3 className="text-2xl font-black text-white">{averageScore}</h3>
+              <span className="text-xs font-semibold text-white/70">/ 250</span>
             </div>
-            <p className="text-[10px] text-slate-500">Pass benchmark: 200/250</p>
+            <p className="text-[10px] text-white/60">Pass benchmark: 200/250</p>
           </div>
         </div>
 
         {/* Card 3: Highest Score */}
-        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div className="p-3 bg-amber-50 text-amber-600 rounded-xl">
+        <div className="glass-panel p-5 rounded-3xl shadow-lg border border-white/25 flex items-center gap-4 text-white">
+          <div className="p-3 bg-amber-500/20 text-amber-300 rounded-2xl border border-amber-400/30 backdrop-blur">
             <TrendingUp className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Highest Score</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-white/70">Highest Score</span>
             <div className="flex items-baseline gap-1 mt-0.5">
-              <h3 className="text-2xl font-black text-slate-900">{highestScore}</h3>
-              <span className="text-xs font-semibold text-slate-400">/ 250</span>
+              <h3 className="text-2xl font-black text-white">{highestScore}</h3>
+              <span className="text-xs font-semibold text-white/70">/ 250</span>
             </div>
-            <p className="text-[10px] text-slate-500">Personal best result</p>
+            <p className="text-[10px] text-white/60">Personal best result</p>
           </div>
         </div>
 
         {/* Card 4: Weakest Section Alert */}
-        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
-          <div className="p-3 bg-red-50 text-red-600 rounded-xl">
+        <div className="glass-panel p-5 rounded-3xl shadow-lg border border-white/25 flex items-center gap-4 text-white">
+          <div className="p-3 bg-rose-500/20 text-rose-300 rounded-2xl border border-rose-400/30 backdrop-blur">
             <AlertTriangle className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Weakest Area</span>
-            <h3 className="text-xs font-bold text-slate-900 truncate max-w-[140px] mt-0.5">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-white/70">Weakest Area</span>
+            <h3 className="text-xs font-bold text-white truncate max-w-[140px] mt-0.5">
               {totalTaken > 0 ? weakest.name.split(' ')[0] : 'No attempts yet'}
             </h3>
-            <p className="text-[10px] text-red-600 font-semibold mt-0.5">
+            <p className="text-[10px] text-rose-300 font-semibold mt-0.5">
               {totalTaken > 0 ? `Avg: ${weakest.avg}% — Practice needed` : 'Take test to evaluate'}
             </p>
           </div>
@@ -171,25 +171,18 @@ export const StudentDashboard: React.FC = () => {
       </div>
 
       {/* RECENT ATTEMPTS TABLE */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="p-5 border-b border-slate-200 flex items-center justify-between">
+      <div className="rounded-[2.25rem] glass-panel shadow-2xl border border-white/25 overflow-hidden text-white">
+        <div className="p-5 border-b border-white/15 flex items-center justify-between">
           <div>
-            <h3 className="font-bold text-slate-900 text-sm">Recent Exam Attempts</h3>
-            <p className="text-xs text-slate-500">View official scores and print result certificates</p>
+            <h3 className="font-bold text-white text-sm">Recent Exam Attempts</h3>
+            <p className="text-xs text-white/70">View official scores and print result certificates</p>
           </div>
-          <button
-            onClick={() => navigateTo('results')}
-            className="text-xs font-semibold text-orange-600 hover:text-orange-700 flex items-center gap-1"
-          >
-            <span>View All</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
         </div>
 
         {userAttempts.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+              <thead className="bg-white/10 text-white/80 font-semibold border-b border-white/15">
                 <tr>
                   <th className="px-5 py-3">Mock Test</th>
                   <th className="px-5 py-3">Completed Date</th>
@@ -198,26 +191,26 @@ export const StudentDashboard: React.FC = () => {
                   <th className="px-5 py-3 text-right">Official Report</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-white/10">
                 {userAttempts.slice(0, 5).map(att => {
                   const test = mockTests.find(t => t.id === att.mock_test_id);
                   return (
-                    <tr key={att.id} className="hover:bg-slate-50/70 transition">
-                      <td className="px-5 py-3.5 font-semibold text-slate-900">
+                    <tr key={att.id} className="hover:bg-white/10 transition">
+                      <td className="px-5 py-3.5 font-semibold text-white">
                         {test?.title || 'JFT-Basic Mock'}
                       </td>
-                      <td className="px-5 py-3.5 text-slate-500">
+                      <td className="px-5 py-3.5 text-white/70">
                         {att.completed_at ? new Date(att.completed_at).toLocaleDateString() : '—'}
                       </td>
                       <td className="px-5 py-3.5">
-                        <span className="font-mono font-bold text-slate-900 text-sm">{att.total_score}</span>
-                        <span className="text-slate-400"> / 250</span>
+                        <span className="font-mono font-bold text-white text-sm">{att.total_score}</span>
+                        <span className="text-white/60"> / 250</span>
                       </td>
                       <td className="px-5 py-3.5">
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
                           att.passed
-                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                            : 'bg-red-100 text-red-800 border border-red-300'
+                            ? 'bg-emerald-500/25 text-emerald-200 border-emerald-400/40'
+                            : 'bg-rose-500/25 text-rose-200 border-rose-400/40'
                         }`}>
                           {att.passed ? 'PASSED (合格)' : 'FAILED (不合格)'}
                         </span>
@@ -225,9 +218,9 @@ export const StudentDashboard: React.FC = () => {
                       <td className="px-5 py-3.5 text-right">
                         <button
                           onClick={() => navigateTo('result-sheet', { attemptId: att.id })}
-                          className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-semibold text-[11px] inline-flex items-center gap-1.5 transition"
+                          className="px-3.5 py-1.5 glass-capsule-item text-white rounded-full font-semibold text-[11px] inline-flex items-center gap-1.5 transition"
                         >
-                          <FileSpreadsheet className="w-3.5 h-3.5 text-orange-500" />
+                          <FileSpreadsheet className="w-3.5 h-3.5 text-amber-300" />
                           <span>View & Print</span>
                         </button>
                       </td>
@@ -238,7 +231,7 @@ export const StudentDashboard: React.FC = () => {
             </table>
           </div>
         ) : (
-          <div className="p-8 text-center text-slate-500 text-xs">
+          <div className="p-8 text-center text-white/70 text-xs">
             No exams taken yet. Click "Launch Mock Exam" above to start your first JFT-Basic simulation!
           </div>
         )}

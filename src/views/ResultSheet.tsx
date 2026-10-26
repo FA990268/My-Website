@@ -45,16 +45,16 @@ export const ResultSheet: React.FC = () => {
 
   if (!attempt) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
-        <div className="bg-white rounded-3xl p-8 border border-slate-200 text-center space-y-4 max-w-md shadow-sm">
+      <div className="min-h-screen flex items-center justify-center p-6 font-sans">
+        <div className="glass-panel rounded-3xl p-8 text-center space-y-4 max-w-md">
           <div className="text-4xl">📄</div>
-          <h3 className="font-extrabold text-lg text-slate-800">No Exam Attempt Found</h3>
-          <p className="text-xs text-slate-500">
+          <h3 className="font-extrabold text-lg text-slate-800 dark:text-white">No Exam Attempt Found</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Please select a mock test to launch the Prometric CBT simulator.
           </p>
           <button
             onClick={() => navigateTo('mock-tests')}
-            className="px-5 py-2.5 bg-rose-600 text-white font-bold rounded-xl text-xs hover:bg-rose-500"
+            className="px-5 py-2.5 glass-btn-primary font-bold rounded-xl text-xs"
           >
             Go to Mock Tests Directory
           </button>
@@ -121,13 +121,13 @@ export const ResultSheet: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans py-8">
+    <div className="min-h-screen font-sans py-8">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Top Actions & Breadcrumb */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <button
             onClick={() => navigateTo('mock-tests')}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition"
+            className="glass-capsule-item px-4 py-2 inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 transition"
           >
             <span>← Back to Mock Tests</span>
           </button>
@@ -135,7 +135,7 @@ export const ResultSheet: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => window.print()}
-              className="px-3.5 py-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-2xs"
+              className="glass-capsule-item px-4 py-2 text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center gap-1.5"
             >
               <Printer className="w-3.5 h-3.5 text-slate-500" />
               <span>Print Official Certificate</span>
@@ -143,7 +143,7 @@ export const ResultSheet: React.FC = () => {
 
             <button
               onClick={() => navigateTo('preview', { testId: attempt.mock_test_id })}
-              className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-rose-600/30"
+              className="px-4 py-2 glass-btn-primary rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-rose-600/30"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>Retake Mock Exam</span>
@@ -152,9 +152,9 @@ export const ResultSheet: React.FC = () => {
         </div>
 
         {/* 1. OFFICIAL-STYLE SCORE CERTIFICATE CARD */}
-        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-lg overflow-hidden">
+        <div className="glass-panel rounded-3xl overflow-hidden">
           {/* Certificate Header Banner */}
-          <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-slate-800">
+          <div className="bg-gradient-to-r from-slate-900/80 via-indigo-950/80 to-slate-900/80 backdrop-blur-md text-white p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-white/10">
             <div className="space-y-1.5">
               <div className="flex items-center gap-2">
                 <span className="w-6 h-6 rounded bg-rose-600 flex items-center justify-center font-black text-xs">
@@ -172,7 +172,7 @@ export const ResultSheet: React.FC = () => {
               </p>
             </div>
 
-            <div className="bg-white/10 backdrop-blur rounded-2xl p-4 border border-white/15 text-right shrink-0">
+            <div className="glass-panel rounded-2xl p-4 border border-white/20 text-right shrink-0">
               <div className="text-[10px] font-bold text-slate-300 uppercase">Candidate Name</div>
               <div className="text-sm font-black text-white">{currentUser.full_name}</div>
               <div className="text-[10px] text-slate-400 mt-1">ID: {attempt.id.slice(0, 16)}</div>
@@ -183,8 +183,8 @@ export const ResultSheet: React.FC = () => {
           <div
             className={`p-5 flex flex-col sm:flex-row items-center justify-between gap-4 ${
               attempt.passed
-                ? 'bg-emerald-500 text-slate-950'
-                : 'bg-rose-600 text-white'
+                ? 'bg-emerald-500/85 backdrop-blur-md text-slate-950'
+                : 'bg-rose-600/85 backdrop-blur-md text-white'
             }`}
           >
             <div className="flex items-center gap-3">
@@ -207,7 +207,7 @@ export const ResultSheet: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-slate-950/20 backdrop-blur px-4 py-2 rounded-2xl text-center shrink-0">
+            <div className="bg-slate-950/30 backdrop-blur-md px-4 py-2 rounded-2xl text-center shrink-0 border border-white/20">
               <div className="text-2xl sm:text-3xl font-black">
                 {attempt.total_score} <span className="text-sm font-normal">/ 250</span>
               </div>
@@ -219,24 +219,24 @@ export const ResultSheet: React.FC = () => {
 
           {/* Section-Wise Percentages & Score Bars */}
           <div className="p-6 sm:p-8 space-y-6">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Section Breakdown & Accuracy Percentages
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {sectionScores.map(sec => (
-                <div key={sec.num} className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-2">
+                <div key={sec.num} className="p-4 glass-panel rounded-2xl space-y-2">
                   <div className="flex items-center justify-between text-xs font-bold">
-                    <span className="text-slate-900">
+                    <span className="text-slate-900 dark:text-white">
                       Section {sec.num}: {sec.name}
                     </span>
-                    <span className={`text-sm font-black ${sec.score >= 80 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                    <span className={`text-sm font-black ${sec.score >= 80 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600'}`}>
                       {sec.score}%
                     </span>
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-slate-200/50 dark:bg-white/10 h-2.5 rounded-full overflow-hidden">
                     <div
                       className={`h-full transition-all duration-500 ${
                         sec.score >= 80 ? 'bg-emerald-500' : 'bg-rose-500'
@@ -245,7 +245,7 @@ export const ResultSheet: React.FC = () => {
                     ></div>
                   </div>
 
-                  <div className="flex justify-between text-[10px] text-slate-500">
+                  <div className="flex justify-between text-[10px] text-slate-500 dark:text-slate-400">
                     <span>12 Questions</span>
                     <span>Target: 80%+ (10/12 Correct)</span>
                   </div>
@@ -256,26 +256,26 @@ export const ResultSheet: React.FC = () => {
         </div>
 
         {/* 2. AI WEAK POINT ANALYSIS PANEL */}
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 space-y-6 shadow-sm">
+        <div className="glass-panel rounded-3xl p-6 sm:p-8 space-y-6">
           <div className="flex items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-rose-600">
                 <BarChart3 className="w-4 h-4" />
                 <span>Diagnostic Engine</span>
               </div>
-              <h2 className="text-xl font-black text-slate-900 tracking-tight">
+              <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
                 AI Weak Point Analysis & Recommended Actions
               </h2>
             </div>
-            <span className="text-xs font-bold px-3 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
+            <span className="text-xs font-bold px-3 py-1 rounded-full bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/30">
               Priority Review Identified
             </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
             {/* Visual Radar / Skill Polygon Simulator */}
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center space-y-3">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <div className="glass-panel rounded-2xl p-6 text-center space-y-3">
+              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 Skill Balance Radar
               </span>
               <div className="relative w-40 h-40 mx-auto flex items-center justify-center">
@@ -305,11 +305,11 @@ export const ResultSheet: React.FC = () => {
                     strokeWidth="2"
                   />
                 </svg>
-                <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-slate-700">
+                <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-slate-700 dark:text-slate-300">
                   JFT-Basic
                 </div>
               </div>
-              <p className="text-[10px] text-slate-500">
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">
                 Vocab: {attempt.section_scores.section1}% • Conv: {attempt.section_scores.section2}%<br />
                 Audio: {attempt.section_scores.section3}% • Read: {attempt.section_scores.section4}%
               </p>
@@ -317,26 +317,26 @@ export const ResultSheet: React.FC = () => {
 
             {/* Diagnostic Report */}
             <div className="md:col-span-2 space-y-4">
-              <div className="p-4 bg-rose-50 border border-rose-200/80 rounded-2xl space-y-2">
-                <div className="flex items-center gap-2 text-rose-900 font-bold text-xs">
+              <div className="p-4 glass-panel border-rose-500/30 bg-rose-500/10 rounded-2xl space-y-2">
+                <div className="flex items-center gap-2 text-rose-900 dark:text-rose-200 font-bold text-xs">
                   <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
                   <span>Lowest Scoring Area: Section {lowestSection.num} ({lowestSection.name.split(' ')[0]})</span>
                 </div>
-                <p className="text-xs text-rose-800 leading-relaxed">
+                <p className="text-xs text-rose-800 dark:text-rose-200/90 leading-relaxed">
                   Your accuracy in Section {lowestSection.num} was <strong>{lowestSection.score}%</strong>. In a Prometric CBT exam, this single section reduces your aggregate scaled buffer.
                 </p>
               </div>
 
               {/* Actionable recommendation with direct tool link */}
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="p-4 glass-panel rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="space-y-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Recommended Study Tool</span>
-                  <h4 className="text-xs sm:text-sm font-bold text-slate-900">{recommendation.toolName}</h4>
-                  <p className="text-xs text-slate-500">{recommendation.desc}</p>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Recommended Study Tool</span>
+                  <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">{recommendation.toolName}</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-300">{recommendation.desc}</p>
                 </div>
                 <button
                   onClick={() => navigateTo('tools')}
-                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shrink-0"
+                  className="px-4 py-2 glass-btn-primary rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shrink-0"
                 >
                   <Compass className="w-3.5 h-3.5" />
                   <span>Practice in Tools Hub</span>
@@ -347,47 +347,47 @@ export const ResultSheet: React.FC = () => {
         </div>
 
         {/* 3. QUESTION-BY-QUESTION ANSWER REVIEW */}
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 space-y-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+        <div className="glass-panel rounded-3xl p-6 sm:p-8 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
             <div>
-              <h2 className="text-xl font-black text-slate-900 tracking-tight">
+              <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
                 Question-by-Question Answer Review
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Inspect your selections, correct answers, full translations, and grammar breakdowns.
               </p>
             </div>
 
-            {/* Filter Tabs */}
-            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-bold">
+            {/* Filter Tabs as Transparent Capsules */}
+            <div className="flex items-center gap-1.5 p-1 rounded-full glass-capsule-bar text-xs font-bold">
               <button
                 onClick={() => setReviewFilter('all')}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  reviewFilter === 'all' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+                className={`px-3 py-1.5 rounded-full transition ${
+                  reviewFilter === 'all' ? 'glass-capsule-item-active' : 'glass-capsule-item text-slate-700 dark:text-slate-300'
                 }`}
               >
                 All ({testQuestions.length})
               </button>
               <button
                 onClick={() => setReviewFilter('correct')}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  reviewFilter === 'correct' ? 'bg-white text-emerald-700 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+                className={`px-3 py-1.5 rounded-full transition ${
+                  reviewFilter === 'correct' ? 'glass-capsule-item-active text-emerald-300' : 'glass-capsule-item text-slate-700 dark:text-slate-300'
                 }`}
               >
                 Correct
               </button>
               <button
                 onClick={() => setReviewFilter('incorrect')}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  reviewFilter === 'incorrect' ? 'bg-white text-rose-700 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+                className={`px-3 py-1.5 rounded-full transition ${
+                  reviewFilter === 'incorrect' ? 'glass-capsule-item-active text-rose-300' : 'glass-capsule-item text-slate-700 dark:text-slate-300'
                 }`}
               >
                 Incorrect
               </button>
               <button
                 onClick={() => setReviewFilter('flagged')}
-                className={`px-3 py-1.5 rounded-lg transition ${
-                  reviewFilter === 'flagged' ? 'bg-white text-amber-700 shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+                className={`px-3 py-1.5 rounded-full transition ${
+                  reviewFilter === 'flagged' ? 'glass-capsule-item-active text-amber-300' : 'glass-capsule-item text-slate-700 dark:text-slate-300'
                 }`}
               >
                 Flagged
@@ -405,19 +405,19 @@ export const ResultSheet: React.FC = () => {
               return (
                 <div
                   key={q.id}
-                  className={`p-5 rounded-2xl border space-y-3 transition ${
+                  className={`p-5 rounded-2xl glass-panel space-y-3 transition ${
                     isCorrect
-                      ? 'bg-emerald-50/30 border-emerald-200'
-                      : 'bg-rose-50/30 border-rose-200'
+                      ? 'border-emerald-500/30 bg-emerald-500/10'
+                      : 'border-rose-500/30 bg-rose-500/10'
                   }`}
                 >
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
-                      <span className="font-black text-slate-800">
+                      <span className="font-black text-slate-900 dark:text-white">
                         Question #{q.question_order} (Section {q.section_number})
                       </span>
                       {isFlagged && (
-                        <span className="flex items-center gap-1 text-[10px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">
+                        <span className="flex items-center gap-1 text-[10px] font-bold bg-amber-400/20 text-amber-800 dark:text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full">
                           <Flag className="w-2.5 h-2.5 fill-amber-500" />
                           <span>Flagged</span>
                         </span>
@@ -426,7 +426,7 @@ export const ResultSheet: React.FC = () => {
 
                     <span
                       className={`text-xs font-black px-2.5 py-0.5 rounded-full ${
-                        isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                        isCorrect ? 'bg-emerald-400/20 text-emerald-900 dark:text-emerald-300 border border-emerald-400/30' : 'bg-rose-400/20 text-rose-900 dark:text-rose-300 border border-rose-400/30'
                       }`}
                     >
                       {isCorrect ? '✓ Correct' : '✗ Incorrect'}
@@ -434,13 +434,13 @@ export const ResultSheet: React.FC = () => {
                   </div>
 
                   {/* Japanese Prompt */}
-                  <div className="font-japanese text-sm font-semibold text-slate-900 leading-relaxed">
+                  <div className="font-japanese text-sm font-semibold text-slate-900 dark:text-white leading-relaxed">
                     {renderFurigana(q.prompt_text)}
                   </div>
 
                   {/* Reading Passage if present */}
                   {q.reading_passage && (
-                    <div className="p-3 bg-white border border-slate-200 rounded-xl text-xs text-slate-700 font-japanese leading-relaxed whitespace-pre-line">
+                    <div className="p-3 bg-white/40 dark:bg-black/30 border border-white/20 rounded-xl text-xs text-slate-800 dark:text-slate-200 font-japanese leading-relaxed whitespace-pre-line backdrop-blur-sm">
                       {renderFurigana(q.reading_passage)}
                     </div>
                   )}
@@ -451,11 +451,11 @@ export const ResultSheet: React.FC = () => {
                       const isUserSelected = userChoice === optIdx;
                       const isOptionCorrect = optIdx === q.correct_option_index;
 
-                      let styleClass = 'bg-white border-slate-200 text-slate-700';
+                      let styleClass = 'glass-capsule-item text-slate-800 dark:text-slate-200';
                       if (isOptionCorrect) {
-                        styleClass = 'bg-emerald-100/70 border-emerald-500 text-emerald-950 font-bold';
+                        styleClass = 'bg-emerald-500/25 border-emerald-400/50 text-emerald-950 dark:text-emerald-200 font-bold';
                       } else if (isUserSelected && !isOptionCorrect) {
-                        styleClass = 'bg-rose-100/70 border-rose-500 text-rose-950 line-through';
+                        styleClass = 'bg-rose-500/25 border-rose-400/50 text-rose-950 dark:text-rose-200 line-through';
                       }
 
                       return (
@@ -464,18 +464,18 @@ export const ResultSheet: React.FC = () => {
                           className={`p-2.5 rounded-xl text-xs border flex items-center justify-between ${styleClass}`}
                         >
                           <div className="flex items-center gap-2">
-                            <span className="w-5 h-5 rounded-md bg-white/80 font-bold text-[10px] flex items-center justify-center">
+                            <span className="w-5 h-5 rounded-md bg-white/30 dark:bg-white/10 font-bold text-[10px] flex items-center justify-center">
                               {opt.label}
                             </span>
                             <span className="font-japanese">{opt.text}</span>
                           </div>
                           {isOptionCorrect && (
-                            <span className="text-[9px] font-black uppercase text-emerald-800">
+                            <span className="text-[9px] font-black uppercase text-emerald-800 dark:text-emerald-300 bg-emerald-400/20 px-1.5 py-0.5 rounded-full">
                               Correct Choice
                             </span>
                           )}
                           {isUserSelected && !isOptionCorrect && (
-                            <span className="text-[9px] font-black uppercase text-rose-800">
+                            <span className="text-[9px] font-black uppercase text-rose-800 dark:text-rose-300 bg-rose-400/20 px-1.5 py-0.5 rounded-full">
                               Your Answer
                             </span>
                           )}
@@ -486,7 +486,7 @@ export const ResultSheet: React.FC = () => {
 
                   {/* Explanation Callout */}
                   {q.explanation && (
-                    <div className="p-3 bg-white/80 border border-slate-200 rounded-xl text-xs text-slate-600 leading-relaxed">
+                    <div className="p-3 bg-white/40 dark:bg-black/30 border border-white/20 rounded-xl text-xs text-slate-700 dark:text-slate-300 leading-relaxed backdrop-blur-sm">
                       <strong>💡 Explanation:</strong> {q.explanation}
                     </div>
                   )}
