@@ -1563,28 +1563,34 @@ export const AdminPanel: React.FC = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {[
                     {
+                      name: 'Green Meadow Hills',
+                      desc: 'Screenshot 4 Glass',
+                      url: '/wallpapers/glass-meadow-hills.jpg'
+                    },
+                    {
+                      name: 'Pixellab 3D Emerald',
+                      desc: 'Screenshot 1 Spheres',
+                      url: '/wallpapers/glass-green-spheres.jpg'
+                    },
+                    {
+                      name: 'Cyan Aurora Mesh',
+                      desc: 'Screenshot 3 Dark Neon',
+                      url: '/wallpapers/glass-cyan-aurora.jpg'
+                    },
+                    {
+                      name: 'Slate Studio Capsule',
+                      desc: 'Screenshot 2 Studio',
+                      url: '/wallpapers/glass-slate-studio.jpg'
+                    },
+                    {
                       name: 'Tokyo Skyline',
+                      desc: 'Metropolitan Night',
                       url: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=2000&q=80'
                     },
                     {
                       name: 'Mount Fuji',
+                      desc: 'Morning Dawn',
                       url: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=2000&q=80'
-                    },
-                    {
-                      name: 'Prometric CBT',
-                      url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=2000&q=80'
-                    },
-                    {
-                      name: 'Kyoto Bamboo',
-                      url: 'https://images.unsplash.com/photo-1492571350019-22de08371fd3?auto=format&fit=crop&w=2000&q=80'
-                    },
-                    {
-                      name: 'Dark Obsidian',
-                      url: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=2000&q=80'
-                    },
-                    {
-                      name: 'Clean Slate Glass',
-                      url: ''
                     }
                   ].map(preset => (
                     <button
@@ -1595,14 +1601,17 @@ export const AdminPanel: React.FC = () => {
                         setThemeToast(`✓ Applied preset wallpaper "${preset.name}"!`);
                         setTimeout(() => setThemeToast(null), 3000);
                       }}
-                      className={`p-2 rounded-xl text-left border transition text-xs flex flex-col justify-between h-16 ${
+                      className={`p-2.5 rounded-2xl text-left border transition text-xs flex flex-col justify-between h-20 ${
                         themeConfig.backgroundImageUrl === preset.url
-                          ? 'border-amber-400 bg-amber-500/20 font-bold text-amber-200'
-                          : 'border-white/10 bg-white/5 hover:bg-white/10 text-slate-300'
+                          ? 'border-white bg-white/20 font-bold text-white shadow-lg backdrop-blur'
+                          : 'border-white/20 bg-white/5 hover:bg-white/10 text-white/80'
                       }`}
                     >
-                      <span className="truncate">{preset.name}</span>
-                      <span className="text-[9px] text-slate-400">1-click apply</span>
+                      <div>
+                        <div className="font-bold text-white truncate">{preset.name}</div>
+                        <div className="text-[10px] text-white/60">{preset.desc}</div>
+                      </div>
+                      <span className="text-[9px] text-emerald-300 font-semibold">1-click apply</span>
                     </button>
                   ))}
                 </div>

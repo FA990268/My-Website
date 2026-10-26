@@ -217,12 +217,12 @@ export const SplitScreenLiveExam: React.FC<SplitScreenLiveExamProps> = ({ onTogg
           TOP STICKY HEADER (Matches Screenshot 2 & 3 Exactly, Fully Responsive)
           Left: EXIT, Center-Left: 59:59 box, Center-Right: CANDIDATE: [NAME], Right: FINISH
           ========================================================================= */}
-      <header className="sticky top-0 z-50 bg-[#101420] border-b border-[#1c2438] px-3 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between shadow-xl w-full">
+      <header className="sticky top-0 z-50 bg-slate-950/75 backdrop-blur-xl border-b border-white/15 px-3 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between shadow-xl w-full">
         {/* Left: EXIT Button & Mobile View Switcher */}
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowExitModal(true)}
-            className="bg-[#232a3d] hover:bg-[#2d364f] text-slate-300 hover:text-white font-bold text-xs sm:text-sm px-4 sm:px-6 py-1.5 sm:py-2 rounded-xl uppercase tracking-wider transition shadow-sm"
+            className="bg-white/10 hover:bg-white/20 border border-white/20 text-slate-200 hover:text-white font-bold text-xs sm:text-sm px-4 sm:px-6 py-1.5 sm:py-2 rounded-xl uppercase tracking-wider transition shadow-sm backdrop-blur"
           >
             EXIT
           </button>
@@ -230,7 +230,7 @@ export const SplitScreenLiveExam: React.FC<SplitScreenLiveExamProps> = ({ onTogg
           {onToggleMode && (
             <button
               onClick={onToggleMode}
-              className="hidden xl:flex text-[10px] text-slate-400 hover:text-white bg-[#1a2030] px-2.5 py-1.5 rounded-lg border border-[#2b354e] font-semibold"
+              className="hidden xl:flex text-[10px] text-slate-300 hover:text-white bg-white/10 px-2.5 py-1.5 rounded-lg border border-white/15 font-semibold backdrop-blur"
               title="Switch to Classic Prometric View"
             >
               Classic CBT
@@ -540,7 +540,7 @@ export const SplitScreenLiveExam: React.FC<SplitScreenLiveExamProps> = ({ onTogg
           )}
 
           {/* Section Header Banner in Blue-Bordered Box (Matches Screenshot 2 & 3) */}
-          <div className="border-2 border-[#2563eb] bg-[#141b2f] rounded-xl px-4 py-2.5 text-white font-black text-sm tracking-wide shadow-md flex items-center justify-between w-full">
+          <div className="border border-blue-400/60 bg-blue-950/40 backdrop-blur-md rounded-xl px-4 py-2.5 text-white font-black text-sm tracking-wide shadow-md flex items-center justify-between w-full">
             <span className="uppercase">{activeSectionTitle}</span>
             <span className="text-[11px] font-normal text-blue-300">
               {displayQuestions.length} Questions
@@ -557,7 +557,7 @@ export const SplitScreenLiveExam: React.FC<SplitScreenLiveExamProps> = ({ onTogg
               return (
                 <div
                   key={q.id}
-                  className="bg-[#151a28] border border-[#21293e] rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-md hover:border-[#2f3b58] transition w-full"
+                  className="bg-white/10 border border-white/20 backdrop-blur-md rounded-2xl p-3.5 sm:p-4 space-y-3 shadow-md hover:border-white/35 transition w-full"
                 >
                   {/* Card Header: "Question X" on Left, "1 Pts" on Right */}
                   <div className="flex items-center justify-between">

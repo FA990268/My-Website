@@ -45,7 +45,7 @@ export function App() {
         <div
           className="fixed inset-0 pointer-events-none transition-all duration-300 z-0"
           style={{
-            backgroundColor: themeConfig.fullTransparency ? 'rgba(15, 23, 42, 0.45)' : 'rgba(248, 250, 252, 0.82)',
+            backgroundColor: themeConfig.fullTransparency ? 'rgba(0, 0, 0, 0.1)' : 'rgba(248, 250, 252, 0.82)',
             backdropFilter: themeConfig.isGlassEnabled ? `blur(${themeConfig.glassBlur}px)` : undefined
           }}
         />

@@ -3,13 +3,13 @@ import { ALL_MOCK_TESTS } from './mockTestsData';
 
 export const DEFAULT_THEME_CONFIG: ThemeConfig = {
   customLogoUrl: '',
-  backgroundImageUrl: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=2000&q=80',
+  backgroundImageUrl: '/wallpapers/glass-meadow-hills.jpg',
   instituteName: 'DAI ICHI ACADEMY CBT',
   instituteTitle: 'Dai Ichi Academy Khulna',
   instituteSlogan: 'Japanese Language and Visa Consultancy',
   isGlassEnabled: true,
-  glassOpacity: 70,
-  glassBlur: 16,
+  glassOpacity: 25,
+  glassBlur: 24,
   glassBorder: true,
   fullTransparency: true,
   brightness: 100,
